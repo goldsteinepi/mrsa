@@ -59,11 +59,11 @@ admit.net = function(dat, at) {
       dat$nw <- activate.vertex.attribute(dat$nw, prefix = "testatus", value = "s", onset = at, terminus = Inf, v = newNodes)
     }
     if (modes == 1) {
-
+      
       #set proportion of admissions to prevalent MRSA colonization
       prev_colon = rbinom(length(newNodes), 1, dat$param$birth.prob)
       dat$attr$status <- c(dat$attr$status, c(rep("s", sum(prev_colon==0)), rep("i", sum(prev_colon==1))))
-
+      
       dat$attr$active <- c(dat$attr$active, rep(1, length(newNodes)))
       dat$attr$infTime <- c(dat$attr$infTime, rep(NA, length(newNodes)))
       dat$attr$entrTime <- c(dat$attr$entrTime, rep(at, length(newNodes)))
@@ -177,7 +177,7 @@ surveil.net = function(dat, at) {
       
       #per unit design, can isolate up to 4 infants
       if ((sum(dat$attr$location[dat$attr$active==1] == "isolation") + isolation) > 4) {
-
+        
         #check if any infants can be isolated
         isolation_avail = 4 - sum(dat$attr$location[dat$attr$active==1] == "isolation")
         
@@ -266,16 +266,16 @@ for (i in 1:as.numeric(as.Date("2015-05-31")-as.Date("2015-01-01")))
   cat("\n\n************** ","Observation: ",i," **************\n",sep="")
   
   today = as.Date("2015-01-01")+i-1
-
+  
   #get census as daily total since we don't have hourly
   todays_census = NICU$Census_admission[NICU$Date_admission==today][1]
   
   #impute missing census (no admissions that day) by averaging two days before and after
   if (is.na(todays_census))
     todays_census = round(mean(c(NICU$Census_admission[NICU$Date_admission==today-2][1], NICU$Census_admission[NICU$Date_admission==today-1][1], NICU$Census_admission[NICU$Date_admission==today+1][1], NICU$Census_admission[NICU$Date_admission==today+2][1]), na.rm=T))
-
+  
   census = c(census, todays_census)
-
+  
   #go through each hour
   for (j in 0:23)
   {
@@ -800,162 +800,162 @@ rm(n_tries,n_success)
 save.image("mrsa_sim_672_54.RData")
 
 
-### AGGREGATE DATA for ANALYSES ##
-
-mrsa_sim = data.frame("surveil"=NA,
-                      "hygiene"=NA,
-                      "timestep"=NA,
-                      "b.flow"=NA,
-                      "bs.flow"=NA,
-                      "bi.flow"=NA,
-                      "ds.flow"=NA,
-                      "di.flow"=NA,
-                      "i.num.location.isolation"=NA,
-                      "s.num.location.isolation"=NA,
-                      "capacity.nicu"=NA,
-                      "capacity.isolation"=NA,
-                      "surveil.active"=NA,
-                      "surveil.unknown.i"=NA,
-                      "surveil.unknown.s"=NA,
-                      "surveil.known.i"=NA,
-                      "surveil.known.s"=NA,
-                      "surveil.detected"=NA,
-                      "surveil.decolon.success"=NA,
-                      "surveil.decolon.success.colonizedtime"=NA,
-                      "surveil.decolon.fail"=NA,
-                      "surveil.cohort"=NA,
-                      "surveil.cohort.prop"=NA, stringsAsFactors=F)
-
-rm(list = ls()[-which(ls()=="mrsa_sim")]); gc();
-load("mrsa_sim_dynamic_87.RData")
-mrsa_sim = rbind(mrsa_sim, data.frame("surveil"=rep("dynamic",network_steps),
-                                      "hygiene"=rep(87,network_steps),
-                                      "timestep"=1:network_steps,
-                                      "b.flow"=rowMeans(mrsa_sim_dynamic_87$epi$b.flow),
-                                      "bs.flow"=rowMeans(mrsa_sim_dynamic_87$epi$bs.flow),
-                                      "bi.flow"=rowMeans(mrsa_sim_dynamic_87$epi$bi.flow),
-                                      "ds.flow"=rowMeans(mrsa_sim_dynamic_87$epi$ds.flow),
-                                      "di.flow"=rowMeans(mrsa_sim_dynamic_87$epi$di.flow),
-                                      "i.num.location.isolation"=rowMeans(mrsa_sim_dynamic_87$epi$i.num.location.isolation),
-                                      "s.num.location.isolation"=rowMeans(mrsa_sim_dynamic_87$epi$s.num.location.isolation),
-                                      "capacity.nicu"=rowSums(mrsa_sim_dynamic_87$epi$capacity.nicu),
-                                      "capacity.isolation"=rowSums(mrsa_sim_dynamic_87$epi$capacity.isolation),
-                                      "surveil.active"=rowMeans(mrsa_sim_dynamic_87$epi$surveil.active),
-                                      "surveil.unknown.i"=rowMeans(mrsa_sim_dynamic_87$epi$surveil.unknown.i),
-                                      "surveil.unknown.s"=rowMeans(mrsa_sim_dynamic_87$epi$surveil.unknown.s),
-                                      "surveil.known.i"=rowMeans(mrsa_sim_dynamic_87$epi$surveil.known.i),
-                                      "surveil.known.s"=rowMeans(mrsa_sim_dynamic_87$epi$surveil.known.s),
-                                      "surveil.detected"=rowMeans(mrsa_sim_dynamic_87$epi$surveil.detected, na.rm=T),
-                                      "surveil.decolon.success"=rowMeans(mrsa_sim_dynamic_87$epi$surveil.decolon.success, na.rm=T),
-                                      "surveil.decolon.success.colonizedtime"=rowMeans(mrsa_sim_dynamic_87$epi$surveil.decolon.success.colonizedtime, na.rm=T),
-                                      "surveil.decolon.fail"=rowMeans(mrsa_sim_dynamic_87$epi$surveil.decolon.fail, na.rm=T),
-                                      "surveil.cohort"=rowMeans(mrsa_sim_dynamic_87$epi$surveil.cohort, na.rm=T),
-                                      "surveil.cohort.prop"=rowMeans(mrsa_sim_dynamic_87$epi$surveil.cohort/mrsa_sim_dynamic_87$epi$surveil.known.i, na.rm=T), stringsAsFactors=F))
-
-rm(list = ls()[-which(ls()=="mrsa_sim")]); gc();
-load("mrsa_sim_168_87.RData")
-mrsa_sim = rbind(mrsa_sim, data.frame("surveil"=rep(168,network_steps),
-                                      "hygiene"=rep(87,network_steps),
-                                      "timestep"=1:network_steps,
-                                      "b.flow"=rowMeans(mrsa_sim_168_87$epi$b.flow),
-                                      "bs.flow"=rowMeans(mrsa_sim_168_87$epi$bs.flow),
-                                      "bi.flow"=rowMeans(mrsa_sim_168_87$epi$bi.flow),
-                                      "ds.flow"=rowMeans(mrsa_sim_168_87$epi$ds.flow),
-                                      "di.flow"=rowMeans(mrsa_sim_168_87$epi$di.flow),
-                                      "i.num.location.isolation"=rowMeans(mrsa_sim_168_87$epi$i.num.location.isolation),
-                                      "s.num.location.isolation"=rowMeans(mrsa_sim_168_87$epi$s.num.location.isolation),
-                                      "capacity.nicu"=rowSums(mrsa_sim_168_87$epi$capacity.nicu),
-                                      "capacity.isolation"=rowSums(mrsa_sim_168_87$epi$capacity.isolation),
-                                      "surveil.active"=rowMeans(mrsa_sim_168_87$epi$surveil.active),
-                                      "surveil.unknown.i"=rowMeans(mrsa_sim_168_87$epi$surveil.unknown.i),
-                                      "surveil.unknown.s"=rowMeans(mrsa_sim_168_87$epi$surveil.unknown.s),
-                                      "surveil.known.i"=rowMeans(mrsa_sim_168_87$epi$surveil.known.i),
-                                      "surveil.known.s"=rowMeans(mrsa_sim_168_87$epi$surveil.known.s),
-                                      "surveil.detected"=rowMeans(mrsa_sim_168_87$epi$surveil.detected, na.rm=T),
-                                      "surveil.decolon.success"=rowMeans(mrsa_sim_168_87$epi$surveil.decolon.success, na.rm=T),
-                                      "surveil.decolon.success.colonizedtime"=rowMeans(mrsa_sim_168_87$epi$surveil.decolon.success.colonizedtime, na.rm=T),
-                                      "surveil.decolon.fail"=rowMeans(mrsa_sim_168_87$epi$surveil.decolon.fail, na.rm=T),
-                                      "surveil.cohort"=rowMeans(mrsa_sim_168_87$epi$surveil.cohort, na.rm=T),
-                                      "surveil.cohort.prop"=rowMeans(mrsa_sim_168_87$epi$surveil.cohort/mrsa_sim_168_87$epi$surveil.known.i, na.rm=T), stringsAsFactors=F))
-
-rm(list = ls()[-which(ls()=="mrsa_sim")]); gc();
-load("mrsa_sim_336_87.RData")
-mrsa_sim = rbind(mrsa_sim, data.frame("surveil"=rep(336,network_steps),
-                                      "hygiene"=rep(87,network_steps),
-                                      "timestep"=1:network_steps,
-                                      "b.flow"=rowMeans(mrsa_sim_336_87$epi$b.flow),
-                                      "bs.flow"=rowMeans(mrsa_sim_336_87$epi$bs.flow),
-                                      "bi.flow"=rowMeans(mrsa_sim_336_87$epi$bi.flow),
-                                      "ds.flow"=rowMeans(mrsa_sim_336_87$epi$ds.flow),
-                                      "di.flow"=rowMeans(mrsa_sim_336_87$epi$di.flow),
-                                      "i.num.location.isolation"=rowMeans(mrsa_sim_336_87$epi$i.num.location.isolation),
-                                      "s.num.location.isolation"=rowMeans(mrsa_sim_336_87$epi$s.num.location.isolation),
-                                      "capacity.nicu"=rowSums(mrsa_sim_336_87$epi$capacity.nicu),
-                                      "capacity.isolation"=rowSums(mrsa_sim_336_87$epi$capacity.isolation),
-                                      "surveil.active"=rowMeans(mrsa_sim_336_87$epi$surveil.active),
-                                      "surveil.unknown.i"=rowMeans(mrsa_sim_336_87$epi$surveil.unknown.i),
-                                      "surveil.unknown.s"=rowMeans(mrsa_sim_336_87$epi$surveil.unknown.s),
-                                      "surveil.known.i"=rowMeans(mrsa_sim_336_87$epi$surveil.known.i),
-                                      "surveil.known.s"=rowMeans(mrsa_sim_336_87$epi$surveil.known.s),
-                                      "surveil.detected"=rowMeans(mrsa_sim_336_87$epi$surveil.detected, na.rm=T),
-                                      "surveil.decolon.success"=rowMeans(mrsa_sim_336_87$epi$surveil.decolon.success, na.rm=T),
-                                      "surveil.decolon.success.colonizedtime"=rowMeans(mrsa_sim_336_87$epi$surveil.decolon.success.colonizedtime, na.rm=T),
-                                      "surveil.decolon.fail"=rowMeans(mrsa_sim_336_87$epi$surveil.decolon.fail, na.rm=T),
-                                      "surveil.cohort"=rowMeans(mrsa_sim_336_87$epi$surveil.cohort, na.rm=T),
-                                      "surveil.cohort.prop"=rowMeans(mrsa_sim_336_87$epi$surveil.cohort/mrsa_sim_336_87$epi$surveil.known.i, na.rm=T), stringsAsFactors=F))
-
-rm(list = ls()[-which(ls()=="mrsa_sim")]); gc();
-load("mrsa_sim_504_87.RData")
-mrsa_sim = rbind(mrsa_sim, data.frame("surveil"=rep(504,network_steps),
-                                      "hygiene"=rep(87,network_steps),
-                                      "timestep"=1:network_steps,
-                                      "b.flow"=rowMeans(mrsa_sim_504_87$epi$b.flow),
-                                      "bs.flow"=rowMeans(mrsa_sim_504_87$epi$bs.flow),
-                                      "bi.flow"=rowMeans(mrsa_sim_504_87$epi$bi.flow),
-                                      "ds.flow"=rowMeans(mrsa_sim_504_87$epi$ds.flow),
-                                      "di.flow"=rowMeans(mrsa_sim_504_87$epi$di.flow),
-                                      "i.num.location.isolation"=rowMeans(mrsa_sim_504_87$epi$i.num.location.isolation),
-                                      "s.num.location.isolation"=rowMeans(mrsa_sim_504_87$epi$s.num.location.isolation),
-                                      "capacity.nicu"=rowSums(mrsa_sim_504_87$epi$capacity.nicu),
-                                      "capacity.isolation"=rowSums(mrsa_sim_504_87$epi$capacity.isolation),
-                                      "surveil.active"=rowMeans(mrsa_sim_504_87$epi$surveil.active),
-                                      "surveil.unknown.i"=rowMeans(mrsa_sim_504_87$epi$surveil.unknown.i),
-                                      "surveil.unknown.s"=rowMeans(mrsa_sim_504_87$epi$surveil.unknown.s),
-                                      "surveil.known.i"=rowMeans(mrsa_sim_504_87$epi$surveil.known.i),
-                                      "surveil.known.s"=rowMeans(mrsa_sim_504_87$epi$surveil.known.s),
-                                      "surveil.detected"=rowMeans(mrsa_sim_504_87$epi$surveil.detected, na.rm=T),
-                                      "surveil.decolon.success"=rowMeans(mrsa_sim_504_87$epi$surveil.decolon.success, na.rm=T),
-                                      "surveil.decolon.success.colonizedtime"=rowMeans(mrsa_sim_504_87$epi$surveil.decolon.success.colonizedtime, na.rm=T),
-                                      "surveil.decolon.fail"=rowMeans(mrsa_sim_504_87$epi$surveil.decolon.fail, na.rm=T),
-                                      "surveil.cohort"=rowMeans(mrsa_sim_504_87$epi$surveil.cohort, na.rm=T),
-                                      "surveil.cohort.prop"=rowMeans(mrsa_sim_504_87$epi$surveil.cohort/mrsa_sim_504_87$epi$surveil.known.i, na.rm=T), stringsAsFactors=F))
-
-rm(list = ls()[-which(ls()=="mrsa_sim")]); gc();
-load("mrsa_sim_672_87.RData")
-mrsa_sim = rbind(mrsa_sim, data.frame("surveil"=rep(672,network_steps),
-                                      "hygiene"=rep(87,network_steps),
-                                      "timestep"=1:network_steps,
-                                      "b.flow"=rowMeans(mrsa_sim_672_87$epi$b.flow),
-                                      "bs.flow"=rowMeans(mrsa_sim_672_87$epi$bs.flow),
-                                      "bi.flow"=rowMeans(mrsa_sim_672_87$epi$bi.flow),
-                                      "ds.flow"=rowMeans(mrsa_sim_672_87$epi$ds.flow),
-                                      "di.flow"=rowMeans(mrsa_sim_672_87$epi$di.flow),
-                                      "i.num.location.isolation"=rowMeans(mrsa_sim_672_87$epi$i.num.location.isolation),
-                                      "s.num.location.isolation"=rowMeans(mrsa_sim_672_87$epi$s.num.location.isolation),
-                                      "capacity.nicu"=rowSums(mrsa_sim_672_87$epi$capacity.nicu),
-                                      "capacity.isolation"=rowSums(mrsa_sim_672_87$epi$capacity.isolation),
-                                      "surveil.active"=rowMeans(mrsa_sim_672_87$epi$surveil.active),
-                                      "surveil.unknown.i"=rowMeans(mrsa_sim_672_87$epi$surveil.unknown.i),
-                                      "surveil.unknown.s"=rowMeans(mrsa_sim_672_87$epi$surveil.unknown.s),
-                                      "surveil.known.i"=rowMeans(mrsa_sim_672_87$epi$surveil.known.i),
-                                      "surveil.known.s"=rowMeans(mrsa_sim_672_87$epi$surveil.known.s),
-                                      "surveil.detected"=rowMeans(mrsa_sim_672_87$epi$surveil.detected, na.rm=T),
-                                      "surveil.decolon.success"=rowMeans(mrsa_sim_672_87$epi$surveil.decolon.success, na.rm=T),
-                                      "surveil.decolon.success.colonizedtime"=rowMeans(mrsa_sim_672_87$epi$surveil.decolon.success.colonizedtime, na.rm=T),
-                                      "surveil.decolon.fail"=rowMeans(mrsa_sim_672_87$epi$surveil.decolon.fail, na.rm=T),
-                                      "surveil.cohort"=rowMeans(mrsa_sim_672_87$epi$surveil.cohort, na.rm=T),
-                                      "surveil.cohort.prop"=rowMeans(mrsa_sim_672_87$epi$surveil.cohort/mrsa_sim_672_87$epi$surveil.known.i, na.rm=T), stringsAsFactors=F))
-
+# ### AGGREGATE DATA for ANALYSES ##
+# 
+# mrsa_sim = data.frame("surveil"=NA,
+#                       "hygiene"=NA,
+#                       "timestep"=NA,
+#                       "b.flow"=NA,
+#                       "bs.flow"=NA,
+#                       "bi.flow"=NA,
+#                       "ds.flow"=NA,
+#                       "di.flow"=NA,
+#                       "i.num.location.isolation"=NA,
+#                       "s.num.location.isolation"=NA,
+#                       "capacity.nicu"=NA,
+#                       "capacity.isolation"=NA,
+#                       "surveil.active"=NA,
+#                       "surveil.unknown.i"=NA,
+#                       "surveil.unknown.s"=NA,
+#                       "surveil.known.i"=NA,
+#                       "surveil.known.s"=NA,
+#                       "surveil.detected"=NA,
+#                       "surveil.decolon.success"=NA,
+#                       "surveil.decolon.success.colonizedtime"=NA,
+#                       "surveil.decolon.fail"=NA,
+#                       "surveil.cohort"=NA,
+#                       "surveil.cohort.prop"=NA, stringsAsFactors=F)
+# 
+# rm(list = ls()[-which(ls()=="mrsa_sim")]); gc();
+# load("mrsa_sim_dynamic_87.RData")
+# mrsa_sim = rbind(mrsa_sim, data.frame("surveil"=rep("dynamic",network_steps),
+#                                       "hygiene"=rep(87,network_steps),
+#                                       "timestep"=1:network_steps,
+#                                       "b.flow"=rowMeans(mrsa_sim_dynamic_87$epi$b.flow),
+#                                       "bs.flow"=rowMeans(mrsa_sim_dynamic_87$epi$bs.flow),
+#                                       "bi.flow"=rowMeans(mrsa_sim_dynamic_87$epi$bi.flow),
+#                                       "ds.flow"=rowMeans(mrsa_sim_dynamic_87$epi$ds.flow),
+#                                       "di.flow"=rowMeans(mrsa_sim_dynamic_87$epi$di.flow),
+#                                       "i.num.location.isolation"=rowMeans(mrsa_sim_dynamic_87$epi$i.num.location.isolation),
+#                                       "s.num.location.isolation"=rowMeans(mrsa_sim_dynamic_87$epi$s.num.location.isolation),
+#                                       "capacity.nicu"=rowSums(mrsa_sim_dynamic_87$epi$capacity.nicu),
+#                                       "capacity.isolation"=rowSums(mrsa_sim_dynamic_87$epi$capacity.isolation),
+#                                       "surveil.active"=rowMeans(mrsa_sim_dynamic_87$epi$surveil.active),
+#                                       "surveil.unknown.i"=rowMeans(mrsa_sim_dynamic_87$epi$surveil.unknown.i),
+#                                       "surveil.unknown.s"=rowMeans(mrsa_sim_dynamic_87$epi$surveil.unknown.s),
+#                                       "surveil.known.i"=rowMeans(mrsa_sim_dynamic_87$epi$surveil.known.i),
+#                                       "surveil.known.s"=rowMeans(mrsa_sim_dynamic_87$epi$surveil.known.s),
+#                                       "surveil.detected"=rowMeans(mrsa_sim_dynamic_87$epi$surveil.detected, na.rm=T),
+#                                       "surveil.decolon.success"=rowMeans(mrsa_sim_dynamic_87$epi$surveil.decolon.success, na.rm=T),
+#                                       "surveil.decolon.success.colonizedtime"=rowMeans(mrsa_sim_dynamic_87$epi$surveil.decolon.success.colonizedtime, na.rm=T),
+#                                       "surveil.decolon.fail"=rowMeans(mrsa_sim_dynamic_87$epi$surveil.decolon.fail, na.rm=T),
+#                                       "surveil.cohort"=rowMeans(mrsa_sim_dynamic_87$epi$surveil.cohort, na.rm=T),
+#                                       "surveil.cohort.prop"=rowMeans(mrsa_sim_dynamic_87$epi$surveil.cohort/mrsa_sim_dynamic_87$epi$surveil.known.i, na.rm=T), stringsAsFactors=F))
+# 
+# rm(list = ls()[-which(ls()=="mrsa_sim")]); gc();
+# load("mrsa_sim_168_87.RData")
+# mrsa_sim = rbind(mrsa_sim, data.frame("surveil"=rep(168,network_steps),
+#                                       "hygiene"=rep(87,network_steps),
+#                                       "timestep"=1:network_steps,
+#                                       "b.flow"=rowMeans(mrsa_sim_168_87$epi$b.flow),
+#                                       "bs.flow"=rowMeans(mrsa_sim_168_87$epi$bs.flow),
+#                                       "bi.flow"=rowMeans(mrsa_sim_168_87$epi$bi.flow),
+#                                       "ds.flow"=rowMeans(mrsa_sim_168_87$epi$ds.flow),
+#                                       "di.flow"=rowMeans(mrsa_sim_168_87$epi$di.flow),
+#                                       "i.num.location.isolation"=rowMeans(mrsa_sim_168_87$epi$i.num.location.isolation),
+#                                       "s.num.location.isolation"=rowMeans(mrsa_sim_168_87$epi$s.num.location.isolation),
+#                                       "capacity.nicu"=rowSums(mrsa_sim_168_87$epi$capacity.nicu),
+#                                       "capacity.isolation"=rowSums(mrsa_sim_168_87$epi$capacity.isolation),
+#                                       "surveil.active"=rowMeans(mrsa_sim_168_87$epi$surveil.active),
+#                                       "surveil.unknown.i"=rowMeans(mrsa_sim_168_87$epi$surveil.unknown.i),
+#                                       "surveil.unknown.s"=rowMeans(mrsa_sim_168_87$epi$surveil.unknown.s),
+#                                       "surveil.known.i"=rowMeans(mrsa_sim_168_87$epi$surveil.known.i),
+#                                       "surveil.known.s"=rowMeans(mrsa_sim_168_87$epi$surveil.known.s),
+#                                       "surveil.detected"=rowMeans(mrsa_sim_168_87$epi$surveil.detected, na.rm=T),
+#                                       "surveil.decolon.success"=rowMeans(mrsa_sim_168_87$epi$surveil.decolon.success, na.rm=T),
+#                                       "surveil.decolon.success.colonizedtime"=rowMeans(mrsa_sim_168_87$epi$surveil.decolon.success.colonizedtime, na.rm=T),
+#                                       "surveil.decolon.fail"=rowMeans(mrsa_sim_168_87$epi$surveil.decolon.fail, na.rm=T),
+#                                       "surveil.cohort"=rowMeans(mrsa_sim_168_87$epi$surveil.cohort, na.rm=T),
+#                                       "surveil.cohort.prop"=rowMeans(mrsa_sim_168_87$epi$surveil.cohort/mrsa_sim_168_87$epi$surveil.known.i, na.rm=T), stringsAsFactors=F))
+# 
+# rm(list = ls()[-which(ls()=="mrsa_sim")]); gc();
+# load("mrsa_sim_336_87.RData")
+# mrsa_sim = rbind(mrsa_sim, data.frame("surveil"=rep(336,network_steps),
+#                                       "hygiene"=rep(87,network_steps),
+#                                       "timestep"=1:network_steps,
+#                                       "b.flow"=rowMeans(mrsa_sim_336_87$epi$b.flow),
+#                                       "bs.flow"=rowMeans(mrsa_sim_336_87$epi$bs.flow),
+#                                       "bi.flow"=rowMeans(mrsa_sim_336_87$epi$bi.flow),
+#                                       "ds.flow"=rowMeans(mrsa_sim_336_87$epi$ds.flow),
+#                                       "di.flow"=rowMeans(mrsa_sim_336_87$epi$di.flow),
+#                                       "i.num.location.isolation"=rowMeans(mrsa_sim_336_87$epi$i.num.location.isolation),
+#                                       "s.num.location.isolation"=rowMeans(mrsa_sim_336_87$epi$s.num.location.isolation),
+#                                       "capacity.nicu"=rowSums(mrsa_sim_336_87$epi$capacity.nicu),
+#                                       "capacity.isolation"=rowSums(mrsa_sim_336_87$epi$capacity.isolation),
+#                                       "surveil.active"=rowMeans(mrsa_sim_336_87$epi$surveil.active),
+#                                       "surveil.unknown.i"=rowMeans(mrsa_sim_336_87$epi$surveil.unknown.i),
+#                                       "surveil.unknown.s"=rowMeans(mrsa_sim_336_87$epi$surveil.unknown.s),
+#                                       "surveil.known.i"=rowMeans(mrsa_sim_336_87$epi$surveil.known.i),
+#                                       "surveil.known.s"=rowMeans(mrsa_sim_336_87$epi$surveil.known.s),
+#                                       "surveil.detected"=rowMeans(mrsa_sim_336_87$epi$surveil.detected, na.rm=T),
+#                                       "surveil.decolon.success"=rowMeans(mrsa_sim_336_87$epi$surveil.decolon.success, na.rm=T),
+#                                       "surveil.decolon.success.colonizedtime"=rowMeans(mrsa_sim_336_87$epi$surveil.decolon.success.colonizedtime, na.rm=T),
+#                                       "surveil.decolon.fail"=rowMeans(mrsa_sim_336_87$epi$surveil.decolon.fail, na.rm=T),
+#                                       "surveil.cohort"=rowMeans(mrsa_sim_336_87$epi$surveil.cohort, na.rm=T),
+#                                       "surveil.cohort.prop"=rowMeans(mrsa_sim_336_87$epi$surveil.cohort/mrsa_sim_336_87$epi$surveil.known.i, na.rm=T), stringsAsFactors=F))
+# 
+# rm(list = ls()[-which(ls()=="mrsa_sim")]); gc();
+# load("mrsa_sim_504_87.RData")
+# mrsa_sim = rbind(mrsa_sim, data.frame("surveil"=rep(504,network_steps),
+#                                       "hygiene"=rep(87,network_steps),
+#                                       "timestep"=1:network_steps,
+#                                       "b.flow"=rowMeans(mrsa_sim_504_87$epi$b.flow),
+#                                       "bs.flow"=rowMeans(mrsa_sim_504_87$epi$bs.flow),
+#                                       "bi.flow"=rowMeans(mrsa_sim_504_87$epi$bi.flow),
+#                                       "ds.flow"=rowMeans(mrsa_sim_504_87$epi$ds.flow),
+#                                       "di.flow"=rowMeans(mrsa_sim_504_87$epi$di.flow),
+#                                       "i.num.location.isolation"=rowMeans(mrsa_sim_504_87$epi$i.num.location.isolation),
+#                                       "s.num.location.isolation"=rowMeans(mrsa_sim_504_87$epi$s.num.location.isolation),
+#                                       "capacity.nicu"=rowSums(mrsa_sim_504_87$epi$capacity.nicu),
+#                                       "capacity.isolation"=rowSums(mrsa_sim_504_87$epi$capacity.isolation),
+#                                       "surveil.active"=rowMeans(mrsa_sim_504_87$epi$surveil.active),
+#                                       "surveil.unknown.i"=rowMeans(mrsa_sim_504_87$epi$surveil.unknown.i),
+#                                       "surveil.unknown.s"=rowMeans(mrsa_sim_504_87$epi$surveil.unknown.s),
+#                                       "surveil.known.i"=rowMeans(mrsa_sim_504_87$epi$surveil.known.i),
+#                                       "surveil.known.s"=rowMeans(mrsa_sim_504_87$epi$surveil.known.s),
+#                                       "surveil.detected"=rowMeans(mrsa_sim_504_87$epi$surveil.detected, na.rm=T),
+#                                       "surveil.decolon.success"=rowMeans(mrsa_sim_504_87$epi$surveil.decolon.success, na.rm=T),
+#                                       "surveil.decolon.success.colonizedtime"=rowMeans(mrsa_sim_504_87$epi$surveil.decolon.success.colonizedtime, na.rm=T),
+#                                       "surveil.decolon.fail"=rowMeans(mrsa_sim_504_87$epi$surveil.decolon.fail, na.rm=T),
+#                                       "surveil.cohort"=rowMeans(mrsa_sim_504_87$epi$surveil.cohort, na.rm=T),
+#                                       "surveil.cohort.prop"=rowMeans(mrsa_sim_504_87$epi$surveil.cohort/mrsa_sim_504_87$epi$surveil.known.i, na.rm=T), stringsAsFactors=F))
+# 
+# rm(list = ls()[-which(ls()=="mrsa_sim")]); gc();
+# load("mrsa_sim_672_87.RData")
+# mrsa_sim = rbind(mrsa_sim, data.frame("surveil"=rep(672,network_steps),
+#                                       "hygiene"=rep(87,network_steps),
+#                                       "timestep"=1:network_steps,
+#                                       "b.flow"=rowMeans(mrsa_sim_672_87$epi$b.flow),
+#                                       "bs.flow"=rowMeans(mrsa_sim_672_87$epi$bs.flow),
+#                                       "bi.flow"=rowMeans(mrsa_sim_672_87$epi$bi.flow),
+#                                       "ds.flow"=rowMeans(mrsa_sim_672_87$epi$ds.flow),
+#                                       "di.flow"=rowMeans(mrsa_sim_672_87$epi$di.flow),
+#                                       "i.num.location.isolation"=rowMeans(mrsa_sim_672_87$epi$i.num.location.isolation),
+#                                       "s.num.location.isolation"=rowMeans(mrsa_sim_672_87$epi$s.num.location.isolation),
+#                                       "capacity.nicu"=rowSums(mrsa_sim_672_87$epi$capacity.nicu),
+#                                       "capacity.isolation"=rowSums(mrsa_sim_672_87$epi$capacity.isolation),
+#                                       "surveil.active"=rowMeans(mrsa_sim_672_87$epi$surveil.active),
+#                                       "surveil.unknown.i"=rowMeans(mrsa_sim_672_87$epi$surveil.unknown.i),
+#                                       "surveil.unknown.s"=rowMeans(mrsa_sim_672_87$epi$surveil.unknown.s),
+#                                       "surveil.known.i"=rowMeans(mrsa_sim_672_87$epi$surveil.known.i),
+#                                       "surveil.known.s"=rowMeans(mrsa_sim_672_87$epi$surveil.known.s),
+#                                       "surveil.detected"=rowMeans(mrsa_sim_672_87$epi$surveil.detected, na.rm=T),
+#                                       "surveil.decolon.success"=rowMeans(mrsa_sim_672_87$epi$surveil.decolon.success, na.rm=T),
+#                                       "surveil.decolon.success.colonizedtime"=rowMeans(mrsa_sim_672_87$epi$surveil.decolon.success.colonizedtime, na.rm=T),
+#                                       "surveil.decolon.fail"=rowMeans(mrsa_sim_672_87$epi$surveil.decolon.fail, na.rm=T),
+#                                       "surveil.cohort"=rowMeans(mrsa_sim_672_87$epi$surveil.cohort, na.rm=T),
+#                                       "surveil.cohort.prop"=rowMeans(mrsa_sim_672_87$epi$surveil.cohort/mrsa_sim_672_87$epi$surveil.known.i, na.rm=T), stringsAsFactors=F))
+# 
 # rm(list = ls()[-which(ls()=="mrsa_sim")]); gc();
 # load("mrsa_sim_dynamic_54.RData")
 # mrsa_sim = rbind(mrsa_sim, data.frame("surveil"=rep("dynamic",network_steps),
@@ -1085,140 +1085,626 @@ mrsa_sim = rbind(mrsa_sim, data.frame("surveil"=rep(672,network_steps),
 #                                       "surveil.decolon.fail"=rowMeans(mrsa_sim_672_54$epi$surveil.decolon.fail, na.rm=T),
 #                                       "surveil.cohort"=rowMeans(mrsa_sim_672_54$epi$surveil.cohort, na.rm=T),
 #                                       "surveil.cohort.prop"=rowMeans(mrsa_sim_672_54$epi$surveil.cohort/mrsa_sim_672_54$epi$surveil.known.i, na.rm=T), stringsAsFactors=F))
+# 
+# rm(list = ls()[-which(ls()=="mrsa_sim")]); gc();
+# mrsa_sim = mrsa_sim[-1, ]
+# save.image("mrsa_sim_results.RData")
+# 
+# 
+# ### ANALYSES ###
+# 
+# mrsa_sim_location$epi$b.flow
+# mrsa_sim_location$epi$bs.flow
+# mrsa_sim_location$epi$bi.flow
+# mrsa_sim_location$epi$ds.flow
+# mrsa_sim_location$epi$di.flow
+# mrsa_sim_location$epi$capacity.nicu
+# mrsa_sim_location$epi$capacity.isolation
+# 
+# #surveillance data
+# mrsa_sim_location$epi$surveil.active
+# mrsa_sim_location$epi$surveil.unknown.i
+# mrsa_sim_location$epi$surveil.unknown.s
+# mrsa_sim_location$epi$surveil.known.i
+# mrsa_sim_location$epi$surveil.known.s
+# mrsa_sim_location$epi$surveil.detected
+# mrsa_sim_location$epi$surveil.decolon.success
+# mrsa_sim_location$epi$surveil.decolon.success.colonizedtime
+# mrsa_sim_location$epi$surveil.decolon.fail
+# mrsa_sim_location$epi$surveil.cohort
+# 
+# #analytic plots
+# mrsa_sim_location
+# plot(mrsa_sim_location)
+# plot(mrsa_sim_location, sim.lines = TRUE, mean.line = FALSE, qnts = FALSE, popfrac = FALSE)
+# plot(mrsa_sim_location, mean.smooth = FALSE, qnts = 1, qnts.smooth = FALSE, popfrac = FALSE)
+# 
+# #flow size corresponds to the flow between infection and recovery, "si" shows incidence
+# plot(mrsa_sim_location, y = c("si.flow"), qnts = FALSE, leg = TRUE, main = "Flow Sizes")
+# 
+# #plot overall prevalance
+# plot(mrsa_sim_location, y = "i.num", qnts = 1, mean.col = "steelblue", qnts.col = "steelblue", main = "Total Prevalence")
+# 
+# #plot location specific prevalance
+# plot(mrsa_sim_location, y=c("i.num.location.fronthall", "i.num.location.backhall", "i.num.location.quietrm", "i.num.location.isolation"), mean.col=c("red","green","blue","black"), qnts=0.95, legend=T, main="MRSA Colonization by Location")
+# 
+# #obtain simulation data
+# mrsa_sim_location_data = as.data.frame(mrsa_sim_location, out="vals", sim=1)
+# for (i in 1:(n_sims-1)) {
+#   mrsa_sim_location_data = rbind(mrsa_sim_location_data, as.data.frame(mrsa_sim_location, out = "vals", sim=(i+1)))
+# }
+# mrsa_sim_location_data$sim = rep(1:n_sims,network_steps)[order(rep(1:n_sims,network_steps))]
+# 
+# # you can use ggplot here too, if you'd like
+# 
+# library(ggplot2)
+# ggplot(df, aes(x = time)) +
+#   geom_line(aes(y = i.num, group = sim))
 
-rm(list = ls()[-which(ls()=="mrsa_sim")]); gc();
-mrsa_sim = mrsa_sim[-1, ]
-save.image("mrsa_sim_results.RData")
 
+### PLOTS for PAPER ###
 
-### ANALYSES ###
+load("mrsa_sim_672_87.RData")
+y_672 = rowMeans(mrsa_sim_672_87$epi$surveil.known.i)
+rm(list = ls()[-which(ls() %in% c("y_672"))]); gc();
 
-mrsa_sim_location$epi$b.flow
-mrsa_sim_location$epi$bs.flow
-mrsa_sim_location$epi$bi.flow
-mrsa_sim_location$epi$ds.flow
-mrsa_sim_location$epi$di.flow
-mrsa_sim_location$epi$capacity.nicu
-mrsa_sim_location$epi$capacity.isolation
+load("mrsa_sim_504_87.RData")
+y_504 = rowMeans(mrsa_sim_504_87$epi$surveil.known.i)
+rm(list = ls()[-which(ls() %in% c("y_672","y_504"))]); gc();
 
-#surveillance data
-mrsa_sim_location$epi$surveil.active
-mrsa_sim_location$epi$surveil.unknown.i
-mrsa_sim_location$epi$surveil.unknown.s
-mrsa_sim_location$epi$surveil.known.i
-mrsa_sim_location$epi$surveil.known.s
-mrsa_sim_location$epi$surveil.detected
-mrsa_sim_location$epi$surveil.decolon.success
-mrsa_sim_location$epi$surveil.decolon.success.colonizedtime
-mrsa_sim_location$epi$surveil.decolon.fail
-mrsa_sim_location$epi$surveil.cohort
+load("mrsa_sim_336_87.RData")
+y_336 = rowMeans(mrsa_sim_336_87$epi$surveil.known.i)
+rm(list = ls()[-which(ls() %in% c("y_672","y_504","y_336"))]); gc();
 
-#analytic plots
-mrsa_sim_location
-plot(mrsa_sim_location)
-plot(mrsa_sim_location, sim.lines = TRUE, mean.line = FALSE, qnts = FALSE, popfrac = FALSE)
-plot(mrsa_sim_location, mean.smooth = FALSE, qnts = 1, qnts.smooth = FALSE, popfrac = FALSE)
+load("mrsa_sim_168_87.RData")
+y_168 = rowMeans(mrsa_sim_168_87$epi$surveil.known.i)
+rm(list = ls()[-which(ls() %in% c("y_672","y_504","y_336","y_168"))]); gc();
 
-#flow size corresponds to the flow between infection and recovery, "si" shows incidence
-plot(mrsa_sim_location, y = c("si.flow"), qnts = FALSE, leg = TRUE, main = "Flow Sizes")
+load("mrsa_sim_dynamic_87.RData")
+y_dynamic = rowMeans(mrsa_sim_dynamic_87$epi$surveil.known.i)
 
-#plot overall prevalance
-plot(mrsa_sim_location, y = "i.num", qnts = 1, mean.col = "steelblue", qnts.col = "steelblue", main = "Total Prevalence")
-
-#plot location specific prevalance
-plot(mrsa_sim_location, y=c("i.num.location.fronthall", "i.num.location.backhall", "i.num.location.quietrm", "i.num.location.isolation"), mean.col=c("red","green","blue","black"), qnts=0.95, legend=T, main="MRSA Colonization by Location")
-
-#obtain simulation data
-mrsa_sim_location_data = as.data.frame(mrsa_sim_location, out="vals", sim=1)
-for (i in 1:(n_sims-1)) {
-  mrsa_sim_location_data = rbind(mrsa_sim_location_data, as.data.frame(mrsa_sim_location, out = "vals", sim=(i+1)))
-}
-mrsa_sim_location_data$sim = rep(1:n_sims,network_steps)[order(rep(1:n_sims,network_steps))]
-
-# you can use ggplot here too, if you'd like
-
-library(ggplot2)
-ggplot(df, aes(x = time)) +
-  geom_line(aes(y = i.num, group = sim))
-
-
-### ANALYSES for PAPER ###
-
-load("mrsa_sim_results.RData")
-
-#plots, MRSA colonization @ 87% effectiveness
-tiff("Figure1.tif",height=4,width=6,units='in',res=1200)
-plot(x=mrsa_sim$timestep[mrsa_sim$surveil==672 & mrsa_sim$hygiene==87], y=mrsa_sim$surveil.known.i[mrsa_sim$surveil==672 & mrsa_sim$hygiene==87], type="l", xlab="Timestep in Hrs.", ylab="No. MRSA colonized infants", lwd=3, lty=1, col=brewer.pal(4,"Greys")[1])
-lines(x=mrsa_sim$timestep[mrsa_sim$surveil==504 & mrsa_sim$hygiene==87], y=mrsa_sim$surveil.known.i[mrsa_sim$surveil==504 & mrsa_sim$hygiene==87], lwd=3, lty=1, col=brewer.pal(4,"Greys")[2])
-lines(x=mrsa_sim$timestep[mrsa_sim$surveil==336 & mrsa_sim$hygiene==87], y=mrsa_sim$surveil.known.i[mrsa_sim$surveil==336 & mrsa_sim$hygiene==87], lwd=3, lty=1, col=brewer.pal(4,"Greys")[3])
-lines(x=mrsa_sim$timestep[mrsa_sim$surveil==168 & mrsa_sim$hygiene==87], y=mrsa_sim$surveil.known.i[mrsa_sim$surveil==168 & mrsa_sim$hygiene==87], lwd=3, lty=1, col=brewer.pal(4,"Greys")[4])
-lines(x=mrsa_sim$timestep[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87], y=mrsa_sim$surveil.known.i[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87], lwd=5, lty=1, col="#000000")
+#averaged plots, MRSA colonization @ 87% effectiveness
+tiff("Figure1a.tif",height=4,width=6,units='in',res=1200)
+plot(x=1:network_steps, y=y_672, type="l", xlab="Timestep in Hrs.", ylab="No. MRSA colonized infants", lwd=3, lty=1, col=brewer.pal(4,"Greys")[1])
+lines(x=1:network_steps, y=y_504, lwd=3, lty=1, col=brewer.pal(4,"Greys")[2])
+lines(x=1:network_steps, y=y_336, lwd=3, lty=1, col=brewer.pal(4,"Greys")[3])
+lines(x=1:network_steps, y=y_168, lwd=3, lty=1, col=brewer.pal(4,"Greys")[4])
+lines(x=1:network_steps, y=y_dynamic, lwd=5, lty=1, col="#000000")
 legend("topleft", lty=rep(1,5), lwd=c(rep(3,4),5), col=c(brewer.pal(4,"Greys"),"#000000"), c("672 hrs.","504 hrs.","336 hrs.","168 hrs.","dynamic"), cex=0.7)
 dev.off()
 
+#individual dynamic simulation plots, MRSA colonization @ 87% effectiveness
+tiff("Figure1b.tif",height=4,width=6,units='in',res=1200)
+plot(x=1:network_steps, y=mrsa_sim_dynamic_87$epi$surveil.known.i[,5], type="l", ylim=c(0,4), xlab="Timestep in Hrs.", ylab="No. MRSA colonized infants", lwd=3, lty=1, col=brewer.pal(3,"Greys")[1])
+lines(x=1:network_steps, y=mrsa_sim_dynamic_87$epi$surveil.known.i[,10], lwd=3, lty=1, col=brewer.pal(4,"Greys")[2])
+lines(x=1:network_steps, y=mrsa_sim_dynamic_87$epi$surveil.known.i[,75], lwd=3, lty=1, col="#000000")
+legend("topleft", lty=rep(1,5), lwd=c(rep(3,4),5), col=c(brewer.pal(3,"Greys")[1:2],"#000000"), c("simulation #5","simulation #10", "simulation #75"), cex=0.7)
+dev.off()
+
+load("mrsa_sim_672_54.RData")
+y_672 = rowMeans(mrsa_sim_672_54$epi$surveil.known.i)
+rm(list = ls()[-which(ls() %in% c("y_672"))]); gc();
+
+load("mrsa_sim_504_54.RData")
+y_504 = rowMeans(mrsa_sim_504_54$epi$surveil.known.i)
+rm(list = ls()[-which(ls() %in% c("y_672","y_504"))]); gc();
+
+load("mrsa_sim_336_54.RData")
+y_336 = rowMeans(mrsa_sim_336_54$epi$surveil.known.i)
+rm(list = ls()[-which(ls() %in% c("y_672","y_504","y_336"))]); gc();
+
+load("mrsa_sim_168_54.RData")
+y_168 = rowMeans(mrsa_sim_168_54$epi$surveil.known.i)
+rm(list = ls()[-which(ls() %in% c("y_672","y_504","y_336","y_168"))]); gc();
+
+load("mrsa_sim_dynamic_54.RData")
+y_dynamic = rowMeans(mrsa_sim_dynamic_54$epi$surveil.known.i)
+
+#averaged plots, MRSA colonization @ 54% effectiveness
+tiff("Figure2.tif",height=4,width=6,units='in',res=1200)
+plot(x=1:network_steps, y=y_672, type="l", xlab="Timestep in Hrs.", ylab="No. MRSA colonized infants", lwd=3, lty=1, col=brewer.pal(4,"Greys")[1])
+lines(x=1:network_steps, y=y_504, lwd=3, lty=1, col=brewer.pal(4,"Greys")[2])
+lines(x=1:network_steps, y=y_336, lwd=3, lty=1, col=brewer.pal(4,"Greys")[3])
+lines(x=1:network_steps, y=y_168, lwd=3, lty=1, col=brewer.pal(4,"Greys")[4])
+lines(x=1:network_steps, y=y_dynamic, lwd=5, lty=1, col="#000000")
+legend("topleft", lty=rep(1,5), lwd=c(rep(3,4),5), col=c(brewer.pal(4,"Greys"),"#000000"), c("672 hrs.","504 hrs.","336 hrs.","168 hrs.","dynamic"), cex=0.7)
+dev.off()
+
+
+### ANALYSIS for PAPER ###
+
 #general stats from dynamic program
-mrsa_sim$surveil.unknown.i[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87 & mrsa_sim$timestep==2]
-mrsa_sim$surveil.unknown.i[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87 & mrsa_sim$timestep==4392]
-mean(mrsa_sim$surveil.unknown.i[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87], na.rm=T)
-mean(mrsa_sim$surveil.unknown.i[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87], na.rm=T)/mean(mrsa_sim$surveil.active[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87], na.rm=T)
+# mrsa_sim$surveil.unknown.i[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87 & mrsa_sim$timestep==2]
+# mrsa_sim$surveil.unknown.i[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87 & mrsa_sim$timestep==4392]
+# mean(mrsa_sim$surveil.unknown.i[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87], na.rm=T)
+# mean(mrsa_sim$surveil.unknown.i[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87], na.rm=T)/mean(mrsa_sim$surveil.active[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87], na.rm=T)
 
-#indicators for table
-sum(!is.na(mrsa_sim$surveil.detected[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87]))
-sum(!is.na(mrsa_sim$surveil.detected[mrsa_sim$surveil==168 & mrsa_sim$hygiene==87]))
-sum(!is.na(mrsa_sim$surveil.detected[mrsa_sim$surveil==336 & mrsa_sim$hygiene==87]))
-sum(!is.na(mrsa_sim$surveil.detected[mrsa_sim$surveil==504 & mrsa_sim$hygiene==87]))
-sum(!is.na(mrsa_sim$surveil.detected[mrsa_sim$surveil==672 & mrsa_sim$hygiene==87]))
+load("mrsa_sim_dynamic_87.RData")
+mean(colSums(mrsa_sim_dynamic_87$epi$surveil.unknown.i[2,], na.rm=T), na.rm=T)
+mean(colSums(mrsa_sim_dynamic_87$epi$surveil.unknown.i[4392,], na.rm=T), na.rm=T)
+mean(colSums(mrsa_sim_dynamic_87$epi$surveil.unknown.i, na.rm=T), na.rm=T) / network_steps
+mean(colSums(mrsa_sim_dynamic_87$epi$surveil.unknown.i, na.rm=T), na.rm=T) / mean(colSums(mrsa_sim_dynamic_87$epi$surveil.active, na.rm=T), na.rm=T)
 
-mean(mrsa_sim$surveil.active[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.active[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
-mean(mrsa_sim$surveil.active[mrsa_sim$surveil==168 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.active[mrsa_sim$surveil==168 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
-mean(mrsa_sim$surveil.active[mrsa_sim$surveil==336 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.active[mrsa_sim$surveil==336 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
-mean(mrsa_sim$surveil.active[mrsa_sim$surveil==504 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.active[mrsa_sim$surveil==504 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
-mean(mrsa_sim$surveil.active[mrsa_sim$surveil==672 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.active[mrsa_sim$surveil==672 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
+# #indicators for table, 87%
+# sum(!is.na(mrsa_sim$surveil.detected[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87]))
+# sum(!is.na(mrsa_sim$surveil.detected[mrsa_sim$surveil==168 & mrsa_sim$hygiene==87]))
+# sum(!is.na(mrsa_sim$surveil.detected[mrsa_sim$surveil==336 & mrsa_sim$hygiene==87]))
+# sum(!is.na(mrsa_sim$surveil.detected[mrsa_sim$surveil==504 & mrsa_sim$hygiene==87]))
+# sum(!is.na(mrsa_sim$surveil.detected[mrsa_sim$surveil==672 & mrsa_sim$hygiene==87]))
+# 
+# mean(mrsa_sim$surveil.active[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.active[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.active[mrsa_sim$surveil==168 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.active[mrsa_sim$surveil==168 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.active[mrsa_sim$surveil==336 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.active[mrsa_sim$surveil==336 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.active[mrsa_sim$surveil==504 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.active[mrsa_sim$surveil==504 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.active[mrsa_sim$surveil==672 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.active[mrsa_sim$surveil==672 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
+# 
+# mean(mrsa_sim$surveil.detected[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.detected[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.detected[mrsa_sim$surveil==168 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.detected[mrsa_sim$surveil==168 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.detected[mrsa_sim$surveil==336 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.detected[mrsa_sim$surveil==336 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.detected[mrsa_sim$surveil==504 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.detected[mrsa_sim$surveil==504 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.detected[mrsa_sim$surveil==672 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.detected[mrsa_sim$surveil==672 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
+# 
+# sum(mrsa_sim$surveil.detected[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.detected[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T) * sum(!is.na(mrsa_sim$surveil.detected[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87]))
+# sum(mrsa_sim$surveil.detected[mrsa_sim$surveil==168 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.detected[mrsa_sim$surveil==168 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T) * sum(!is.na(mrsa_sim$surveil.detected[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87]))
+# sum(mrsa_sim$surveil.detected[mrsa_sim$surveil==336 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.detected[mrsa_sim$surveil==336 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T) * sum(!is.na(mrsa_sim$surveil.detected[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87]))
+# sum(mrsa_sim$surveil.detected[mrsa_sim$surveil==504 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.detected[mrsa_sim$surveil==504 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T) * sum(!is.na(mrsa_sim$surveil.detected[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87]))
+# sum(mrsa_sim$surveil.detected[mrsa_sim$surveil==672 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.detected[mrsa_sim$surveil==672 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T) * sum(!is.na(mrsa_sim$surveil.detected[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87]))
+# 
+# mean(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==168 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==168 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==336 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==336 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==504 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==504 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==672 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==672 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
+# 
+# mean(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87]/(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87] + mrsa_sim$surveil.decolon.fail[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87]), na.rm=T); quantile(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87]/(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87] + mrsa_sim$surveil.decolon.fail[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87]), probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==168 & mrsa_sim$hygiene==87]/(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==168 & mrsa_sim$hygiene==87] + mrsa_sim$surveil.decolon.fail[mrsa_sim$surveil==168 & mrsa_sim$hygiene==87]), na.rm=T); quantile(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==168 & mrsa_sim$hygiene==87]/(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==168 & mrsa_sim$hygiene==87] + mrsa_sim$surveil.decolon.fail[mrsa_sim$surveil==168 & mrsa_sim$hygiene==87]), probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==336 & mrsa_sim$hygiene==87]/(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==336 & mrsa_sim$hygiene==87] + mrsa_sim$surveil.decolon.fail[mrsa_sim$surveil==336 & mrsa_sim$hygiene==87]), na.rm=T); quantile(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==336 & mrsa_sim$hygiene==87]/(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==336 & mrsa_sim$hygiene==87] + mrsa_sim$surveil.decolon.fail[mrsa_sim$surveil==336 & mrsa_sim$hygiene==87]), probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==504 & mrsa_sim$hygiene==87]/(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==504 & mrsa_sim$hygiene==87] + mrsa_sim$surveil.decolon.fail[mrsa_sim$surveil==504 & mrsa_sim$hygiene==87]), na.rm=T); quantile(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==504 & mrsa_sim$hygiene==87]/(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==504 & mrsa_sim$hygiene==87] + mrsa_sim$surveil.decolon.fail[mrsa_sim$surveil==504 & mrsa_sim$hygiene==87]), probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==672 & mrsa_sim$hygiene==87]/(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==672 & mrsa_sim$hygiene==87] + mrsa_sim$surveil.decolon.fail[mrsa_sim$surveil==672 & mrsa_sim$hygiene==87]), na.rm=T); quantile(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==672 & mrsa_sim$hygiene==87]/(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==672 & mrsa_sim$hygiene==87] + mrsa_sim$surveil.decolon.fail[mrsa_sim$surveil==672 & mrsa_sim$hygiene==87]), probs=c(0.025,0.975), na.rm=T)
+# 
+# mean(mrsa_sim$surveil.decolon.success.colonizedtime[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.decolon.success.colonizedtime[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.decolon.success.colonizedtime[mrsa_sim$surveil==168 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.decolon.success.colonizedtime[mrsa_sim$surveil==168 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.decolon.success.colonizedtime[mrsa_sim$surveil==336 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.decolon.success.colonizedtime[mrsa_sim$surveil==336 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.decolon.success.colonizedtime[mrsa_sim$surveil==504 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.decolon.success.colonizedtime[mrsa_sim$surveil==504 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.decolon.success.colonizedtime[mrsa_sim$surveil==672 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.decolon.success.colonizedtime[mrsa_sim$surveil==672 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
+# 
+# mean(mrsa_sim$i.num.location.isolation[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$i.num.location.isolation[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$i.num.location.isolation[mrsa_sim$surveil==168 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$i.num.location.isolation[mrsa_sim$surveil==168 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$i.num.location.isolation[mrsa_sim$surveil==336 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$i.num.location.isolation[mrsa_sim$surveil==336 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$i.num.location.isolation[mrsa_sim$surveil==504 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$i.num.location.isolation[mrsa_sim$surveil==504 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$i.num.location.isolation[mrsa_sim$surveil==672 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$i.num.location.isolation[mrsa_sim$surveil==672 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
+# 
+# mean(mrsa_sim$s.num.location.isolation[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$s.num.location.isolation[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$s.num.location.isolation[mrsa_sim$surveil==168 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$s.num.location.isolation[mrsa_sim$surveil==168 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$s.num.location.isolation[mrsa_sim$surveil==336 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$s.num.location.isolation[mrsa_sim$surveil==336 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$s.num.location.isolation[mrsa_sim$surveil==504 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$s.num.location.isolation[mrsa_sim$surveil==504 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$s.num.location.isolation[mrsa_sim$surveil==672 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$s.num.location.isolation[mrsa_sim$surveil==672 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
+# 
+# mean(mrsa_sim$surveil.cohort[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.cohort[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.cohort[mrsa_sim$surveil==168 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.cohort[mrsa_sim$surveil==168 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.cohort[mrsa_sim$surveil==336 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.cohort[mrsa_sim$surveil==336 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.cohort[mrsa_sim$surveil==504 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.cohort[mrsa_sim$surveil==504 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.cohort[mrsa_sim$surveil==672 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.cohort[mrsa_sim$surveil==672 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
+# 
+# mean(mrsa_sim$surveil.cohort.prop[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.cohort.prop[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.cohort.prop[mrsa_sim$surveil==168 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.cohort.prop[mrsa_sim$surveil==168 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.cohort.prop[mrsa_sim$surveil==336 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.cohort.prop[mrsa_sim$surveil==336 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.cohort.prop[mrsa_sim$surveil==504 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.cohort.prop[mrsa_sim$surveil==504 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.cohort.prop[mrsa_sim$surveil==672 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.cohort.prop[mrsa_sim$surveil==672 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
+# 
+# #indicators for table, 54%
+# sum(!is.na(mrsa_sim$surveil.detected[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==54]))
+# sum(!is.na(mrsa_sim$surveil.detected[mrsa_sim$surveil==168 & mrsa_sim$hygiene==54]))
+# sum(!is.na(mrsa_sim$surveil.detected[mrsa_sim$surveil==336 & mrsa_sim$hygiene==54]))
+# sum(!is.na(mrsa_sim$surveil.detected[mrsa_sim$surveil==504 & mrsa_sim$hygiene==54]))
+# sum(!is.na(mrsa_sim$surveil.detected[mrsa_sim$surveil==672 & mrsa_sim$hygiene==54]))
+# 
+# mean(mrsa_sim$surveil.active[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==54], na.rm=T); quantile(mrsa_sim$surveil.active[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==54], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.active[mrsa_sim$surveil==168 & mrsa_sim$hygiene==54], na.rm=T); quantile(mrsa_sim$surveil.active[mrsa_sim$surveil==168 & mrsa_sim$hygiene==54], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.active[mrsa_sim$surveil==336 & mrsa_sim$hygiene==54], na.rm=T); quantile(mrsa_sim$surveil.active[mrsa_sim$surveil==336 & mrsa_sim$hygiene==54], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.active[mrsa_sim$surveil==504 & mrsa_sim$hygiene==54], na.rm=T); quantile(mrsa_sim$surveil.active[mrsa_sim$surveil==504 & mrsa_sim$hygiene==54], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.active[mrsa_sim$surveil==672 & mrsa_sim$hygiene==54], na.rm=T); quantile(mrsa_sim$surveil.active[mrsa_sim$surveil==672 & mrsa_sim$hygiene==54], probs=c(0.025,0.975), na.rm=T)
+# 
+# mean(mrsa_sim$surveil.detected[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==54], na.rm=T); quantile(mrsa_sim$surveil.detected[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==54], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.detected[mrsa_sim$surveil==168 & mrsa_sim$hygiene==54], na.rm=T); quantile(mrsa_sim$surveil.detected[mrsa_sim$surveil==168 & mrsa_sim$hygiene==54], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.detected[mrsa_sim$surveil==336 & mrsa_sim$hygiene==54], na.rm=T); quantile(mrsa_sim$surveil.detected[mrsa_sim$surveil==336 & mrsa_sim$hygiene==54], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.detected[mrsa_sim$surveil==504 & mrsa_sim$hygiene==54], na.rm=T); quantile(mrsa_sim$surveil.detected[mrsa_sim$surveil==504 & mrsa_sim$hygiene==54], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.detected[mrsa_sim$surveil==672 & mrsa_sim$hygiene==54], na.rm=T); quantile(mrsa_sim$surveil.detected[mrsa_sim$surveil==672 & mrsa_sim$hygiene==54], probs=c(0.025,0.975), na.rm=T)
+# 
+# sum(mrsa_sim$surveil.detected[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==54], na.rm=T); quantile(mrsa_sim$surveil.detected[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==54], probs=c(0.025,0.975), na.rm=T) * sum(!is.na(mrsa_sim$surveil.detected[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==54]))
+# sum(mrsa_sim$surveil.detected[mrsa_sim$surveil==168 & mrsa_sim$hygiene==54], na.rm=T); quantile(mrsa_sim$surveil.detected[mrsa_sim$surveil==168 & mrsa_sim$hygiene==54], probs=c(0.025,0.975), na.rm=T) * sum(!is.na(mrsa_sim$surveil.detected[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==54]))
+# sum(mrsa_sim$surveil.detected[mrsa_sim$surveil==336 & mrsa_sim$hygiene==54], na.rm=T); quantile(mrsa_sim$surveil.detected[mrsa_sim$surveil==336 & mrsa_sim$hygiene==54], probs=c(0.025,0.975), na.rm=T) * sum(!is.na(mrsa_sim$surveil.detected[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==54]))
+# sum(mrsa_sim$surveil.detected[mrsa_sim$surveil==504 & mrsa_sim$hygiene==54], na.rm=T); quantile(mrsa_sim$surveil.detected[mrsa_sim$surveil==504 & mrsa_sim$hygiene==54], probs=c(0.025,0.975), na.rm=T) * sum(!is.na(mrsa_sim$surveil.detected[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==54]))
+# sum(mrsa_sim$surveil.detected[mrsa_sim$surveil==672 & mrsa_sim$hygiene==54], na.rm=T); quantile(mrsa_sim$surveil.detected[mrsa_sim$surveil==672 & mrsa_sim$hygiene==54], probs=c(0.025,0.975), na.rm=T) * sum(!is.na(mrsa_sim$surveil.detected[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==54]))
+# 
+# mean(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==54], na.rm=T); quantile(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==54], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==168 & mrsa_sim$hygiene==54], na.rm=T); quantile(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==168 & mrsa_sim$hygiene==54], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==336 & mrsa_sim$hygiene==54], na.rm=T); quantile(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==336 & mrsa_sim$hygiene==54], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==504 & mrsa_sim$hygiene==54], na.rm=T); quantile(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==504 & mrsa_sim$hygiene==54], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==672 & mrsa_sim$hygiene==54], na.rm=T); quantile(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==672 & mrsa_sim$hygiene==54], probs=c(0.025,0.975), na.rm=T)
+# 
+# mean(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==54]/(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==54] + mrsa_sim$surveil.decolon.fail[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==54]), na.rm=T); quantile(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==54]/(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==54] + mrsa_sim$surveil.decolon.fail[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==54]), probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==168 & mrsa_sim$hygiene==54]/(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==168 & mrsa_sim$hygiene==54] + mrsa_sim$surveil.decolon.fail[mrsa_sim$surveil==168 & mrsa_sim$hygiene==54]), na.rm=T); quantile(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==168 & mrsa_sim$hygiene==54]/(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==168 & mrsa_sim$hygiene==54] + mrsa_sim$surveil.decolon.fail[mrsa_sim$surveil==168 & mrsa_sim$hygiene==54]), probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==336 & mrsa_sim$hygiene==54]/(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==336 & mrsa_sim$hygiene==54] + mrsa_sim$surveil.decolon.fail[mrsa_sim$surveil==336 & mrsa_sim$hygiene==54]), na.rm=T); quantile(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==336 & mrsa_sim$hygiene==54]/(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==336 & mrsa_sim$hygiene==54] + mrsa_sim$surveil.decolon.fail[mrsa_sim$surveil==336 & mrsa_sim$hygiene==54]), probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==504 & mrsa_sim$hygiene==54]/(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==504 & mrsa_sim$hygiene==54] + mrsa_sim$surveil.decolon.fail[mrsa_sim$surveil==504 & mrsa_sim$hygiene==54]), na.rm=T); quantile(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==504 & mrsa_sim$hygiene==54]/(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==504 & mrsa_sim$hygiene==54] + mrsa_sim$surveil.decolon.fail[mrsa_sim$surveil==504 & mrsa_sim$hygiene==54]), probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==672 & mrsa_sim$hygiene==54]/(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==672 & mrsa_sim$hygiene==54] + mrsa_sim$surveil.decolon.fail[mrsa_sim$surveil==672 & mrsa_sim$hygiene==54]), na.rm=T); quantile(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==672 & mrsa_sim$hygiene==54]/(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==672 & mrsa_sim$hygiene==54] + mrsa_sim$surveil.decolon.fail[mrsa_sim$surveil==672 & mrsa_sim$hygiene==54]), probs=c(0.025,0.975), na.rm=T)
+# 
+# mean(mrsa_sim$surveil.decolon.success.colonizedtime[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==54], na.rm=T); quantile(mrsa_sim$surveil.decolon.success.colonizedtime[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==54], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.decolon.success.colonizedtime[mrsa_sim$surveil==168 & mrsa_sim$hygiene==54], na.rm=T); quantile(mrsa_sim$surveil.decolon.success.colonizedtime[mrsa_sim$surveil==168 & mrsa_sim$hygiene==54], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.decolon.success.colonizedtime[mrsa_sim$surveil==336 & mrsa_sim$hygiene==54], na.rm=T); quantile(mrsa_sim$surveil.decolon.success.colonizedtime[mrsa_sim$surveil==336 & mrsa_sim$hygiene==54], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.decolon.success.colonizedtime[mrsa_sim$surveil==504 & mrsa_sim$hygiene==54], na.rm=T); quantile(mrsa_sim$surveil.decolon.success.colonizedtime[mrsa_sim$surveil==504 & mrsa_sim$hygiene==54], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.decolon.success.colonizedtime[mrsa_sim$surveil==672 & mrsa_sim$hygiene==54], na.rm=T); quantile(mrsa_sim$surveil.decolon.success.colonizedtime[mrsa_sim$surveil==672 & mrsa_sim$hygiene==54], probs=c(0.025,0.975), na.rm=T)
+# 
+# mean(mrsa_sim$i.num.location.isolation[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==54], na.rm=T); quantile(mrsa_sim$i.num.location.isolation[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==54], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$i.num.location.isolation[mrsa_sim$surveil==168 & mrsa_sim$hygiene==54], na.rm=T); quantile(mrsa_sim$i.num.location.isolation[mrsa_sim$surveil==168 & mrsa_sim$hygiene==54], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$i.num.location.isolation[mrsa_sim$surveil==336 & mrsa_sim$hygiene==54], na.rm=T); quantile(mrsa_sim$i.num.location.isolation[mrsa_sim$surveil==336 & mrsa_sim$hygiene==54], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$i.num.location.isolation[mrsa_sim$surveil==504 & mrsa_sim$hygiene==54], na.rm=T); quantile(mrsa_sim$i.num.location.isolation[mrsa_sim$surveil==504 & mrsa_sim$hygiene==54], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$i.num.location.isolation[mrsa_sim$surveil==672 & mrsa_sim$hygiene==54], na.rm=T); quantile(mrsa_sim$i.num.location.isolation[mrsa_sim$surveil==672 & mrsa_sim$hygiene==54], probs=c(0.025,0.975), na.rm=T)
+# 
+# mean(mrsa_sim$s.num.location.isolation[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==54], na.rm=T); quantile(mrsa_sim$s.num.location.isolation[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==54], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$s.num.location.isolation[mrsa_sim$surveil==168 & mrsa_sim$hygiene==54], na.rm=T); quantile(mrsa_sim$s.num.location.isolation[mrsa_sim$surveil==168 & mrsa_sim$hygiene==54], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$s.num.location.isolation[mrsa_sim$surveil==336 & mrsa_sim$hygiene==54], na.rm=T); quantile(mrsa_sim$s.num.location.isolation[mrsa_sim$surveil==336 & mrsa_sim$hygiene==54], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$s.num.location.isolation[mrsa_sim$surveil==504 & mrsa_sim$hygiene==54], na.rm=T); quantile(mrsa_sim$s.num.location.isolation[mrsa_sim$surveil==504 & mrsa_sim$hygiene==54], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$s.num.location.isolation[mrsa_sim$surveil==672 & mrsa_sim$hygiene==54], na.rm=T); quantile(mrsa_sim$s.num.location.isolation[mrsa_sim$surveil==672 & mrsa_sim$hygiene==54], probs=c(0.025,0.975), na.rm=T)
+# 
+# mean(mrsa_sim$surveil.cohort[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==54], na.rm=T); quantile(mrsa_sim$surveil.cohort[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==54], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.cohort[mrsa_sim$surveil==168 & mrsa_sim$hygiene==54], na.rm=T); quantile(mrsa_sim$surveil.cohort[mrsa_sim$surveil==168 & mrsa_sim$hygiene==54], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.cohort[mrsa_sim$surveil==336 & mrsa_sim$hygiene==54], na.rm=T); quantile(mrsa_sim$surveil.cohort[mrsa_sim$surveil==336 & mrsa_sim$hygiene==54], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.cohort[mrsa_sim$surveil==504 & mrsa_sim$hygiene==54], na.rm=T); quantile(mrsa_sim$surveil.cohort[mrsa_sim$surveil==504 & mrsa_sim$hygiene==54], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.cohort[mrsa_sim$surveil==672 & mrsa_sim$hygiene==54], na.rm=T); quantile(mrsa_sim$surveil.cohort[mrsa_sim$surveil==672 & mrsa_sim$hygiene==54], probs=c(0.025,0.975), na.rm=T)
+# 
+# mean(mrsa_sim$surveil.cohort.prop[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==54], na.rm=T); quantile(mrsa_sim$surveil.cohort.prop[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==54], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.cohort.prop[mrsa_sim$surveil==168 & mrsa_sim$hygiene==54], na.rm=T); quantile(mrsa_sim$surveil.cohort.prop[mrsa_sim$surveil==168 & mrsa_sim$hygiene==54], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.cohort.prop[mrsa_sim$surveil==336 & mrsa_sim$hygiene==54], na.rm=T); quantile(mrsa_sim$surveil.cohort.prop[mrsa_sim$surveil==336 & mrsa_sim$hygiene==54], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.cohort.prop[mrsa_sim$surveil==504 & mrsa_sim$hygiene==54], na.rm=T); quantile(mrsa_sim$surveil.cohort.prop[mrsa_sim$surveil==504 & mrsa_sim$hygiene==54], probs=c(0.025,0.975), na.rm=T)
+# mean(mrsa_sim$surveil.cohort.prop[mrsa_sim$surveil==672 & mrsa_sim$hygiene==54], na.rm=T); quantile(mrsa_sim$surveil.cohort.prop[mrsa_sim$surveil==672 & mrsa_sim$hygiene==54], probs=c(0.025,0.975), na.rm=T)
 
-mean(mrsa_sim$surveil.detected[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.detected[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
-mean(mrsa_sim$surveil.detected[mrsa_sim$surveil==168 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.detected[mrsa_sim$surveil==168 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
-mean(mrsa_sim$surveil.detected[mrsa_sim$surveil==336 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.detected[mrsa_sim$surveil==336 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
-mean(mrsa_sim$surveil.detected[mrsa_sim$surveil==504 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.detected[mrsa_sim$surveil==504 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
-mean(mrsa_sim$surveil.detected[mrsa_sim$surveil==672 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.detected[mrsa_sim$surveil==672 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
+#indicators for table: dynamic surveillance, 87% hygiene
+load("mrsa_sim_dynamic_87.RData")
 
-mean(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
-mean(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==168 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==168 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
-mean(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==336 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==336 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
-mean(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==504 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==504 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
-mean(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==672 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==672 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
+sum(!is.na(mrsa_sim_dynamic_87$epi$surveil.detected)) / ncol(mrsa_sim_dynamic_87$epi$surveil.detected)
 
-mean(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87]/(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87] + mrsa_sim$surveil.decolon.fail[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87]), na.rm=T); quantile(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87]/(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87] + mrsa_sim$surveil.decolon.fail[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87]), probs=c(0.025,0.975), na.rm=T)
-mean(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==168 & mrsa_sim$hygiene==87]/(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==168 & mrsa_sim$hygiene==87] + mrsa_sim$surveil.decolon.fail[mrsa_sim$surveil==168 & mrsa_sim$hygiene==87]), na.rm=T); quantile(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==168 & mrsa_sim$hygiene==87]/(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==168 & mrsa_sim$hygiene==87] + mrsa_sim$surveil.decolon.fail[mrsa_sim$surveil==168 & mrsa_sim$hygiene==87]), probs=c(0.025,0.975), na.rm=T)
-mean(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==336 & mrsa_sim$hygiene==87]/(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==336 & mrsa_sim$hygiene==87] + mrsa_sim$surveil.decolon.fail[mrsa_sim$surveil==336 & mrsa_sim$hygiene==87]), na.rm=T); quantile(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==336 & mrsa_sim$hygiene==87]/(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==336 & mrsa_sim$hygiene==87] + mrsa_sim$surveil.decolon.fail[mrsa_sim$surveil==336 & mrsa_sim$hygiene==87]), probs=c(0.025,0.975), na.rm=T)
-mean(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==504 & mrsa_sim$hygiene==87]/(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==504 & mrsa_sim$hygiene==87] + mrsa_sim$surveil.decolon.fail[mrsa_sim$surveil==504 & mrsa_sim$hygiene==87]), na.rm=T); quantile(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==504 & mrsa_sim$hygiene==87]/(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==504 & mrsa_sim$hygiene==87] + mrsa_sim$surveil.decolon.fail[mrsa_sim$surveil==504 & mrsa_sim$hygiene==87]), probs=c(0.025,0.975), na.rm=T)
-mean(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==672 & mrsa_sim$hygiene==87]/(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==672 & mrsa_sim$hygiene==87] + mrsa_sim$surveil.decolon.fail[mrsa_sim$surveil==672 & mrsa_sim$hygiene==87]), na.rm=T); quantile(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==672 & mrsa_sim$hygiene==87]/(mrsa_sim$surveil.decolon.success[mrsa_sim$surveil==672 & mrsa_sim$hygiene==87] + mrsa_sim$surveil.decolon.fail[mrsa_sim$surveil==672 & mrsa_sim$hygiene==87]), probs=c(0.025,0.975), na.rm=T)
+mean(colSums(mrsa_sim_dynamic_87$epi$surveil.active, na.rm=T), na.rm=T) / network_steps
+quantile(colSums(mrsa_sim_dynamic_87$epi$surveil.active, na.rm=T) / network_steps, probs=c(0.025,0.975)) 
 
-mean(mrsa_sim$surveil.decolon.success.colonizedtime[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.decolon.success.colonizedtime[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
-mean(mrsa_sim$surveil.decolon.success.colonizedtime[mrsa_sim$surveil==168 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.decolon.success.colonizedtime[mrsa_sim$surveil==168 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
-mean(mrsa_sim$surveil.decolon.success.colonizedtime[mrsa_sim$surveil==336 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.decolon.success.colonizedtime[mrsa_sim$surveil==336 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
-mean(mrsa_sim$surveil.decolon.success.colonizedtime[mrsa_sim$surveil==504 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.decolon.success.colonizedtime[mrsa_sim$surveil==504 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
-mean(mrsa_sim$surveil.decolon.success.colonizedtime[mrsa_sim$surveil==672 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.decolon.success.colonizedtime[mrsa_sim$surveil==672 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
+mean(colSums(mrsa_sim_dynamic_87$epi$surveil.detected, na.rm=T), na.rm=T) / (sum(!is.na(mrsa_sim_dynamic_87$epi$surveil.detected)) / ncol(mrsa_sim_dynamic_87$epi$surveil.detected))
+quantile(colSums(mrsa_sim_dynamic_87$epi$surveil.detected, na.rm=T) / (sum(!is.na(mrsa_sim_dynamic_87$epi$surveil.detected)) / ncol(mrsa_sim_dynamic_87$epi$surveil.detected)), probs=c(0.025,0.975))
 
-mean(mrsa_sim$i.num.location.isolation[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$i.num.location.isolation[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
-mean(mrsa_sim$i.num.location.isolation[mrsa_sim$surveil==168 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$i.num.location.isolation[mrsa_sim$surveil==168 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
-mean(mrsa_sim$i.num.location.isolation[mrsa_sim$surveil==336 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$i.num.location.isolation[mrsa_sim$surveil==336 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
-mean(mrsa_sim$i.num.location.isolation[mrsa_sim$surveil==504 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$i.num.location.isolation[mrsa_sim$surveil==504 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
-mean(mrsa_sim$i.num.location.isolation[mrsa_sim$surveil==672 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$i.num.location.isolation[mrsa_sim$surveil==672 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
+mean(colSums(mrsa_sim_dynamic_87$epi$surveil.detected, na.rm=T), na.rm=T)
+quantile(colSums(mrsa_sim_dynamic_87$epi$surveil.detected, na.rm=T), probs=c(0.025,0.975))
 
-mean(mrsa_sim$s.num.location.isolation[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$s.num.location.isolation[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
-mean(mrsa_sim$s.num.location.isolation[mrsa_sim$surveil==168 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$s.num.location.isolation[mrsa_sim$surveil==168 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
-mean(mrsa_sim$s.num.location.isolation[mrsa_sim$surveil==336 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$s.num.location.isolation[mrsa_sim$surveil==336 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
-mean(mrsa_sim$s.num.location.isolation[mrsa_sim$surveil==504 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$s.num.location.isolation[mrsa_sim$surveil==504 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
-mean(mrsa_sim$s.num.location.isolation[mrsa_sim$surveil==672 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$s.num.location.isolation[mrsa_sim$surveil==672 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
+mean(colMeans(mrsa_sim_dynamic_87$epi$surveil.decolon.success, na.rm=T), na.rm=T)
+quantile(colMeans(mrsa_sim_dynamic_87$epi$surveil.decolon.success, na.rm=T), probs=c(0.025,0.975))
 
-mean(mrsa_sim$surveil.cohort[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.cohort[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
-mean(mrsa_sim$surveil.cohort[mrsa_sim$surveil==168 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.cohort[mrsa_sim$surveil==168 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
-mean(mrsa_sim$surveil.cohort[mrsa_sim$surveil==336 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.cohort[mrsa_sim$surveil==336 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
-mean(mrsa_sim$surveil.cohort[mrsa_sim$surveil==504 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.cohort[mrsa_sim$surveil==504 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
-mean(mrsa_sim$surveil.cohort[mrsa_sim$surveil==672 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.cohort[mrsa_sim$surveil==672 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
+mean(colMeans(mrsa_sim_dynamic_87$epi$surveil.decolon.success / (mrsa_sim_dynamic_87$epi$surveil.decolon.success+mrsa_sim_dynamic_87$epi$surveil.decolon.fail), na.rm=T),na.rm=T) * 100
+quantile(colMeans(mrsa_sim_dynamic_87$epi$surveil.decolon.success / (mrsa_sim_dynamic_87$epi$surveil.decolon.success+mrsa_sim_dynamic_87$epi$surveil.decolon.fail), na.rm=T) * 100, probs=c(0.025,0.975))
 
-mean(mrsa_sim$surveil.cohort.prop[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.cohort.prop[mrsa_sim$surveil=="dynamic" & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
-mean(mrsa_sim$surveil.cohort.prop[mrsa_sim$surveil==168 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.cohort.prop[mrsa_sim$surveil==168 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
-mean(mrsa_sim$surveil.cohort.prop[mrsa_sim$surveil==336 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.cohort.prop[mrsa_sim$surveil==336 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
-mean(mrsa_sim$surveil.cohort.prop[mrsa_sim$surveil==504 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.cohort.prop[mrsa_sim$surveil==504 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
-mean(mrsa_sim$surveil.cohort.prop[mrsa_sim$surveil==672 & mrsa_sim$hygiene==87], na.rm=T); quantile(mrsa_sim$surveil.cohort.prop[mrsa_sim$surveil==672 & mrsa_sim$hygiene==87], probs=c(0.025,0.975), na.rm=T)
+mean(colSums(mrsa_sim_dynamic_87$epi$surveil.decolon.success.colonizedtime, na.rm=T),na.rm=T) / (sum(!is.na(mrsa_sim_dynamic_87$epi$surveil.detected)) / ncol(mrsa_sim_dynamic_87$epi$surveil.detected))
+quantile(colSums(mrsa_sim_dynamic_87$epi$surveil.decolon.success.colonizedtime, na.rm=T) / (sum(!is.na(mrsa_sim_dynamic_87$epi$surveil.detected)) / ncol(mrsa_sim_dynamic_87$epi$surveil.detected)), probs=c(0.025,0.975))
+
+mean(colSums(mrsa_sim_dynamic_87$epi$i.num.location.isolation, na.rm=T),na.rm=T) / network_steps
+quantile(colSums(mrsa_sim_dynamic_87$epi$i.num.location.isolation, na.rm=T) / network_steps, probs=c(0.025,0.975))
+
+mean(colSums(mrsa_sim_dynamic_87$epi$s.num.location.isolation, na.rm=T),na.rm=T) / network_steps
+quantile(colSums(mrsa_sim_dynamic_87$epi$s.num.location.isolation, na.rm=T) / network_steps, probs=c(0.025,0.975))
+
+mean(colSums(mrsa_sim_dynamic_87$epi$surveil.cohort, na.rm=T),na.rm=T) / (sum(!is.na(mrsa_sim_dynamic_87$epi$surveil.detected)) / ncol(mrsa_sim_dynamic_87$epi$surveil.detected))
+quantile(colSums(mrsa_sim_dynamic_87$epi$surveil.cohort, na.rm=T) / (sum(!is.na(mrsa_sim_dynamic_87$epi$surveil.detected)) / ncol(mrsa_sim_dynamic_87$epi$surveil.detected)), probs=c(0.025,0.975))
+
+mean(colMeans(mrsa_sim_dynamic_87$epi$surveil.cohort/mrsa_sim_dynamic_87$epi$surveil.known.i, na.rm=T),na.rm=T) * 100
+quantile(colMeans(mrsa_sim_dynamic_87$epi$surveil.cohort/mrsa_sim_dynamic_87$epi$surveil.known.i, na.rm=T) * 100, probs=c(0.025,0.975))
+
+#indicators for table: 168 surveillance, 87% hygiene
+load("mrsa_sim_168_87.RData")
+
+sum(!is.na(mrsa_sim_168_87$epi$surveil.detected)) / ncol(mrsa_sim_168_87$epi$surveil.detected)
+
+mean(colSums(mrsa_sim_168_87$epi$surveil.active, na.rm=T), na.rm=T) / network_steps
+quantile(colSums(mrsa_sim_168_87$epi$surveil.active, na.rm=T) / network_steps, probs=c(0.025,0.975)) 
+
+mean(colSums(mrsa_sim_168_87$epi$surveil.detected, na.rm=T), na.rm=T) / (sum(!is.na(mrsa_sim_168_87$epi$surveil.detected)) / ncol(mrsa_sim_168_87$epi$surveil.detected))
+quantile(colSums(mrsa_sim_168_87$epi$surveil.detected, na.rm=T) / (sum(!is.na(mrsa_sim_168_87$epi$surveil.detected)) / ncol(mrsa_sim_168_87$epi$surveil.detected)), probs=c(0.025,0.975))
+
+mean(colSums(mrsa_sim_168_87$epi$surveil.detected, na.rm=T), na.rm=T)
+quantile(colSums(mrsa_sim_168_87$epi$surveil.detected, na.rm=T), probs=c(0.025,0.975))
+
+mean(colMeans(mrsa_sim_168_87$epi$surveil.decolon.success, na.rm=T), na.rm=T)
+quantile(colMeans(mrsa_sim_168_87$epi$surveil.decolon.success, na.rm=T), probs=c(0.025,0.975))
+
+mean(colMeans(mrsa_sim_168_87$epi$surveil.decolon.success / (mrsa_sim_168_87$epi$surveil.decolon.success+mrsa_sim_168_87$epi$surveil.decolon.fail), na.rm=T),na.rm=T) * 100
+quantile(colMeans(mrsa_sim_168_87$epi$surveil.decolon.success / (mrsa_sim_168_87$epi$surveil.decolon.success+mrsa_sim_168_87$epi$surveil.decolon.fail), na.rm=T) * 100, probs=c(0.025,0.975))
+
+mean(colSums(mrsa_sim_168_87$epi$surveil.decolon.success.colonizedtime, na.rm=T),na.rm=T) / (sum(!is.na(mrsa_sim_168_87$epi$surveil.detected)) / ncol(mrsa_sim_168_87$epi$surveil.detected))
+quantile(colSums(mrsa_sim_168_87$epi$surveil.decolon.success.colonizedtime, na.rm=T) / (sum(!is.na(mrsa_sim_168_87$epi$surveil.detected)) / ncol(mrsa_sim_168_87$epi$surveil.detected)), probs=c(0.025,0.975))
+
+mean(colSums(mrsa_sim_168_87$epi$i.num.location.isolation, na.rm=T),na.rm=T) / network_steps
+quantile(colSums(mrsa_sim_168_87$epi$i.num.location.isolation, na.rm=T) / network_steps, probs=c(0.025,0.975))
+
+mean(colSums(mrsa_sim_168_87$epi$s.num.location.isolation, na.rm=T),na.rm=T) / network_steps
+quantile(colSums(mrsa_sim_168_87$epi$s.num.location.isolation, na.rm=T) / network_steps, probs=c(0.025,0.975))
+
+mean(colSums(mrsa_sim_168_87$epi$surveil.cohort, na.rm=T),na.rm=T) / (sum(!is.na(mrsa_sim_168_87$epi$surveil.detected)) / ncol(mrsa_sim_168_87$epi$surveil.detected))
+quantile(colSums(mrsa_sim_168_87$epi$surveil.cohort, na.rm=T) / (sum(!is.na(mrsa_sim_168_87$epi$surveil.detected)) / ncol(mrsa_sim_168_87$epi$surveil.detected)), probs=c(0.025,0.975))
+
+mean(colMeans(mrsa_sim_168_87$epi$surveil.cohort/mrsa_sim_168_87$epi$surveil.known.i, na.rm=T),na.rm=T) * 100
+quantile(colMeans(mrsa_sim_168_87$epi$surveil.cohort/mrsa_sim_168_87$epi$surveil.known.i, na.rm=T) * 100, probs=c(0.025,0.975))
+
+#indicators for table: 336 surveillance, 87% hygiene
+load("mrsa_sim_336_87.RData")
+
+sum(!is.na(mrsa_sim_336_87$epi$surveil.detected)) / ncol(mrsa_sim_336_87$epi$surveil.detected)
+
+mean(colSums(mrsa_sim_336_87$epi$surveil.active, na.rm=T), na.rm=T) / network_steps
+quantile(colSums(mrsa_sim_336_87$epi$surveil.active, na.rm=T) / network_steps, probs=c(0.025,0.975)) 
+
+mean(colSums(mrsa_sim_336_87$epi$surveil.detected, na.rm=T), na.rm=T) / (sum(!is.na(mrsa_sim_336_87$epi$surveil.detected)) / ncol(mrsa_sim_336_87$epi$surveil.detected))
+quantile(colSums(mrsa_sim_336_87$epi$surveil.detected, na.rm=T) / (sum(!is.na(mrsa_sim_336_87$epi$surveil.detected)) / ncol(mrsa_sim_336_87$epi$surveil.detected)), probs=c(0.025,0.975))
+
+mean(colSums(mrsa_sim_336_87$epi$surveil.detected, na.rm=T), na.rm=T)
+quantile(colSums(mrsa_sim_336_87$epi$surveil.detected, na.rm=T), probs=c(0.025,0.975))
+
+mean(colMeans(mrsa_sim_336_87$epi$surveil.decolon.success, na.rm=T), na.rm=T)
+quantile(colMeans(mrsa_sim_336_87$epi$surveil.decolon.success, na.rm=T), probs=c(0.025,0.975))
+
+mean(colMeans(mrsa_sim_336_87$epi$surveil.decolon.success / (mrsa_sim_336_87$epi$surveil.decolon.success+mrsa_sim_336_87$epi$surveil.decolon.fail), na.rm=T),na.rm=T) * 100
+quantile(colMeans(mrsa_sim_336_87$epi$surveil.decolon.success / (mrsa_sim_336_87$epi$surveil.decolon.success+mrsa_sim_336_87$epi$surveil.decolon.fail), na.rm=T) * 100, probs=c(0.025,0.975))
+
+mean(colSums(mrsa_sim_336_87$epi$surveil.decolon.success.colonizedtime, na.rm=T),na.rm=T) / (sum(!is.na(mrsa_sim_336_87$epi$surveil.detected)) / ncol(mrsa_sim_336_87$epi$surveil.detected))
+quantile(colSums(mrsa_sim_336_87$epi$surveil.decolon.success.colonizedtime, na.rm=T) / (sum(!is.na(mrsa_sim_336_87$epi$surveil.detected)) / ncol(mrsa_sim_336_87$epi$surveil.detected)), probs=c(0.025,0.975))
+
+mean(colSums(mrsa_sim_336_87$epi$i.num.location.isolation, na.rm=T),na.rm=T) / network_steps
+quantile(colSums(mrsa_sim_336_87$epi$i.num.location.isolation, na.rm=T) / network_steps, probs=c(0.025,0.975))
+
+mean(colSums(mrsa_sim_336_87$epi$s.num.location.isolation, na.rm=T),na.rm=T) / network_steps
+quantile(colSums(mrsa_sim_336_87$epi$s.num.location.isolation, na.rm=T) / network_steps, probs=c(0.025,0.975))
+
+mean(colSums(mrsa_sim_336_87$epi$surveil.cohort, na.rm=T),na.rm=T) / (sum(!is.na(mrsa_sim_336_87$epi$surveil.detected)) / ncol(mrsa_sim_336_87$epi$surveil.detected))
+quantile(colSums(mrsa_sim_336_87$epi$surveil.cohort, na.rm=T) / (sum(!is.na(mrsa_sim_336_87$epi$surveil.detected)) / ncol(mrsa_sim_336_87$epi$surveil.detected)), probs=c(0.025,0.975))
+
+mean(colMeans(mrsa_sim_336_87$epi$surveil.cohort/mrsa_sim_336_87$epi$surveil.known.i, na.rm=T),na.rm=T) * 100
+quantile(colMeans(mrsa_sim_336_87$epi$surveil.cohort/mrsa_sim_336_87$epi$surveil.known.i, na.rm=T) * 100, probs=c(0.025,0.975))
+
+#indicators for table: 504 surveillance, 87% hygiene
+load("mrsa_sim_504_87.RData")
+
+sum(!is.na(mrsa_sim_504_87$epi$surveil.detected)) / ncol(mrsa_sim_504_87$epi$surveil.detected)
+
+mean(colSums(mrsa_sim_504_87$epi$surveil.active, na.rm=T), na.rm=T) / network_steps
+quantile(colSums(mrsa_sim_504_87$epi$surveil.active, na.rm=T) / network_steps, probs=c(0.025,0.975)) 
+
+mean(colSums(mrsa_sim_504_87$epi$surveil.detected, na.rm=T), na.rm=T) / (sum(!is.na(mrsa_sim_504_87$epi$surveil.detected)) / ncol(mrsa_sim_504_87$epi$surveil.detected))
+quantile(colSums(mrsa_sim_504_87$epi$surveil.detected, na.rm=T) / (sum(!is.na(mrsa_sim_504_87$epi$surveil.detected)) / ncol(mrsa_sim_504_87$epi$surveil.detected)), probs=c(0.025,0.975))
+
+mean(colSums(mrsa_sim_504_87$epi$surveil.detected, na.rm=T), na.rm=T)
+quantile(colSums(mrsa_sim_504_87$epi$surveil.detected, na.rm=T), probs=c(0.025,0.975))
+
+mean(colMeans(mrsa_sim_504_87$epi$surveil.decolon.success, na.rm=T), na.rm=T)
+quantile(colMeans(mrsa_sim_504_87$epi$surveil.decolon.success, na.rm=T), probs=c(0.025,0.975))
+
+mean(colMeans(mrsa_sim_504_87$epi$surveil.decolon.success / (mrsa_sim_504_87$epi$surveil.decolon.success+mrsa_sim_504_87$epi$surveil.decolon.fail), na.rm=T),na.rm=T) * 100
+quantile(colMeans(mrsa_sim_504_87$epi$surveil.decolon.success / (mrsa_sim_504_87$epi$surveil.decolon.success+mrsa_sim_504_87$epi$surveil.decolon.fail), na.rm=T) * 100, probs=c(0.025,0.975))
+
+mean(colSums(mrsa_sim_504_87$epi$surveil.decolon.success.colonizedtime, na.rm=T),na.rm=T) / (sum(!is.na(mrsa_sim_504_87$epi$surveil.detected)) / ncol(mrsa_sim_504_87$epi$surveil.detected))
+quantile(colSums(mrsa_sim_504_87$epi$surveil.decolon.success.colonizedtime, na.rm=T) / (sum(!is.na(mrsa_sim_504_87$epi$surveil.detected)) / ncol(mrsa_sim_504_87$epi$surveil.detected)), probs=c(0.025,0.975))
+
+mean(colSums(mrsa_sim_504_87$epi$i.num.location.isolation, na.rm=T),na.rm=T) / network_steps
+quantile(colSums(mrsa_sim_504_87$epi$i.num.location.isolation, na.rm=T) / network_steps, probs=c(0.025,0.975))
+
+mean(colSums(mrsa_sim_504_87$epi$s.num.location.isolation, na.rm=T),na.rm=T) / network_steps
+quantile(colSums(mrsa_sim_504_87$epi$s.num.location.isolation, na.rm=T) / network_steps, probs=c(0.025,0.975))
+
+mean(colSums(mrsa_sim_504_87$epi$surveil.cohort, na.rm=T),na.rm=T) / (sum(!is.na(mrsa_sim_504_87$epi$surveil.detected)) / ncol(mrsa_sim_504_87$epi$surveil.detected))
+quantile(colSums(mrsa_sim_504_87$epi$surveil.cohort, na.rm=T) / (sum(!is.na(mrsa_sim_504_87$epi$surveil.detected)) / ncol(mrsa_sim_504_87$epi$surveil.detected)), probs=c(0.025,0.975))
+
+mean(colMeans(mrsa_sim_504_87$epi$surveil.cohort/mrsa_sim_504_87$epi$surveil.known.i, na.rm=T),na.rm=T) * 100
+quantile(colMeans(mrsa_sim_504_87$epi$surveil.cohort/mrsa_sim_504_87$epi$surveil.known.i, na.rm=T) * 100, probs=c(0.025,0.975))
+
+#indicators for table: 672 surveillance, 87% hygiene
+load("mrsa_sim_672_87.RData")
+
+sum(!is.na(mrsa_sim_672_87$epi$surveil.detected)) / ncol(mrsa_sim_672_87$epi$surveil.detected)
+
+mean(colSums(mrsa_sim_672_87$epi$surveil.active, na.rm=T), na.rm=T) / network_steps
+quantile(colSums(mrsa_sim_672_87$epi$surveil.active, na.rm=T) / network_steps, probs=c(0.025,0.975)) 
+
+mean(colSums(mrsa_sim_672_87$epi$surveil.detected, na.rm=T), na.rm=T) / (sum(!is.na(mrsa_sim_672_87$epi$surveil.detected)) / ncol(mrsa_sim_672_87$epi$surveil.detected))
+quantile(colSums(mrsa_sim_672_87$epi$surveil.detected, na.rm=T) / (sum(!is.na(mrsa_sim_672_87$epi$surveil.detected)) / ncol(mrsa_sim_672_87$epi$surveil.detected)), probs=c(0.025,0.975))
+
+mean(colSums(mrsa_sim_672_87$epi$surveil.detected, na.rm=T), na.rm=T)
+quantile(colSums(mrsa_sim_672_87$epi$surveil.detected, na.rm=T), probs=c(0.025,0.975))
+
+mean(colMeans(mrsa_sim_672_87$epi$surveil.decolon.success, na.rm=T), na.rm=T)
+quantile(colMeans(mrsa_sim_672_87$epi$surveil.decolon.success, na.rm=T), probs=c(0.025,0.975))
+
+mean(colMeans(mrsa_sim_672_87$epi$surveil.decolon.success / (mrsa_sim_672_87$epi$surveil.decolon.success+mrsa_sim_672_87$epi$surveil.decolon.fail), na.rm=T),na.rm=T) * 100
+quantile(colMeans(mrsa_sim_672_87$epi$surveil.decolon.success / (mrsa_sim_672_87$epi$surveil.decolon.success+mrsa_sim_672_87$epi$surveil.decolon.fail), na.rm=T) * 100, probs=c(0.025,0.975))
+
+mean(colSums(mrsa_sim_672_87$epi$surveil.decolon.success.colonizedtime, na.rm=T),na.rm=T) / (sum(!is.na(mrsa_sim_672_87$epi$surveil.detected)) / ncol(mrsa_sim_672_87$epi$surveil.detected))
+quantile(colSums(mrsa_sim_672_87$epi$surveil.decolon.success.colonizedtime, na.rm=T) / (sum(!is.na(mrsa_sim_672_87$epi$surveil.detected)) / ncol(mrsa_sim_672_87$epi$surveil.detected)), probs=c(0.025,0.975))
+
+mean(colSums(mrsa_sim_672_87$epi$i.num.location.isolation, na.rm=T),na.rm=T) / network_steps
+quantile(colSums(mrsa_sim_672_87$epi$i.num.location.isolation, na.rm=T) / network_steps, probs=c(0.025,0.975))
+
+mean(colSums(mrsa_sim_672_87$epi$s.num.location.isolation, na.rm=T),na.rm=T) / network_steps
+quantile(colSums(mrsa_sim_672_87$epi$s.num.location.isolation, na.rm=T) / network_steps, probs=c(0.025,0.975))
+
+mean(colSums(mrsa_sim_672_87$epi$surveil.cohort, na.rm=T),na.rm=T) / (sum(!is.na(mrsa_sim_672_87$epi$surveil.detected)) / ncol(mrsa_sim_672_87$epi$surveil.detected))
+quantile(colSums(mrsa_sim_672_87$epi$surveil.cohort, na.rm=T) / (sum(!is.na(mrsa_sim_672_87$epi$surveil.detected)) / ncol(mrsa_sim_672_87$epi$surveil.detected)), probs=c(0.025,0.975))
+
+mean(colMeans(mrsa_sim_672_87$epi$surveil.cohort/mrsa_sim_672_87$epi$surveil.known.i, na.rm=T),na.rm=T) * 100
+quantile(colMeans(mrsa_sim_672_87$epi$surveil.cohort/mrsa_sim_672_87$epi$surveil.known.i, na.rm=T) * 100, probs=c(0.025,0.975))
+
+#indicators for table: dynamic surveillance, 54% hygiene
+load("mrsa_sim_dynamic_54.RData")
+
+sum(!is.na(mrsa_sim_dynamic_54$epi$surveil.detected)) / ncol(mrsa_sim_dynamic_54$epi$surveil.detected)
+
+mean(colSums(mrsa_sim_dynamic_54$epi$surveil.active, na.rm=T), na.rm=T) / network_steps
+quantile(colSums(mrsa_sim_dynamic_54$epi$surveil.active, na.rm=T) / network_steps, probs=c(0.025,0.975)) 
+
+mean(colSums(mrsa_sim_dynamic_54$epi$surveil.detected, na.rm=T), na.rm=T) / (sum(!is.na(mrsa_sim_dynamic_54$epi$surveil.detected)) / ncol(mrsa_sim_dynamic_54$epi$surveil.detected))
+quantile(colSums(mrsa_sim_dynamic_54$epi$surveil.detected, na.rm=T) / (sum(!is.na(mrsa_sim_dynamic_54$epi$surveil.detected)) / ncol(mrsa_sim_dynamic_54$epi$surveil.detected)), probs=c(0.025,0.975))
+
+mean(colSums(mrsa_sim_dynamic_54$epi$surveil.detected, na.rm=T), na.rm=T)
+quantile(colSums(mrsa_sim_dynamic_54$epi$surveil.detected, na.rm=T), probs=c(0.025,0.975))
+
+mean(colMeans(mrsa_sim_dynamic_54$epi$surveil.decolon.success, na.rm=T), na.rm=T)
+quantile(colMeans(mrsa_sim_dynamic_54$epi$surveil.decolon.success, na.rm=T), probs=c(0.025,0.975))
+
+mean(colMeans(mrsa_sim_dynamic_54$epi$surveil.decolon.success / (mrsa_sim_dynamic_54$epi$surveil.decolon.success+mrsa_sim_dynamic_54$epi$surveil.decolon.fail), na.rm=T),na.rm=T) * 100
+quantile(colMeans(mrsa_sim_dynamic_54$epi$surveil.decolon.success / (mrsa_sim_dynamic_54$epi$surveil.decolon.success+mrsa_sim_dynamic_54$epi$surveil.decolon.fail), na.rm=T) * 100, probs=c(0.025,0.975))
+
+mean(colSums(mrsa_sim_dynamic_54$epi$surveil.decolon.success.colonizedtime, na.rm=T),na.rm=T) / (sum(!is.na(mrsa_sim_dynamic_54$epi$surveil.detected)) / ncol(mrsa_sim_dynamic_54$epi$surveil.detected))
+quantile(colSums(mrsa_sim_dynamic_54$epi$surveil.decolon.success.colonizedtime, na.rm=T) / (sum(!is.na(mrsa_sim_dynamic_54$epi$surveil.detected)) / ncol(mrsa_sim_dynamic_54$epi$surveil.detected)), probs=c(0.025,0.975))
+
+mean(colSums(mrsa_sim_dynamic_54$epi$i.num.location.isolation, na.rm=T),na.rm=T) / network_steps
+quantile(colSums(mrsa_sim_dynamic_54$epi$i.num.location.isolation, na.rm=T) / network_steps, probs=c(0.025,0.975))
+
+mean(colSums(mrsa_sim_dynamic_54$epi$s.num.location.isolation, na.rm=T),na.rm=T) / network_steps
+quantile(colSums(mrsa_sim_dynamic_54$epi$s.num.location.isolation, na.rm=T) / network_steps, probs=c(0.025,0.975))
+
+mean(colSums(mrsa_sim_dynamic_54$epi$surveil.cohort, na.rm=T),na.rm=T) / (sum(!is.na(mrsa_sim_dynamic_54$epi$surveil.detected)) / ncol(mrsa_sim_dynamic_54$epi$surveil.detected))
+quantile(colSums(mrsa_sim_dynamic_54$epi$surveil.cohort, na.rm=T) / (sum(!is.na(mrsa_sim_dynamic_54$epi$surveil.detected)) / ncol(mrsa_sim_dynamic_54$epi$surveil.detected)), probs=c(0.025,0.975))
+
+mean(colMeans(mrsa_sim_dynamic_54$epi$surveil.cohort/mrsa_sim_dynamic_54$epi$surveil.known.i, na.rm=T),na.rm=T) * 100
+quantile(colMeans(mrsa_sim_dynamic_54$epi$surveil.cohort/mrsa_sim_dynamic_54$epi$surveil.known.i, na.rm=T) * 100, probs=c(0.025,0.975))
+
+#indicators for table: 168 surveillance, 54% hygiene
+load("mrsa_sim_168_54.RData")
+
+sum(!is.na(mrsa_sim_168_54$epi$surveil.detected)) / ncol(mrsa_sim_168_54$epi$surveil.detected)
+
+mean(colSums(mrsa_sim_168_54$epi$surveil.active, na.rm=T), na.rm=T) / network_steps
+quantile(colSums(mrsa_sim_168_54$epi$surveil.active, na.rm=T) / network_steps, probs=c(0.025,0.975)) 
+
+mean(colSums(mrsa_sim_168_54$epi$surveil.detected, na.rm=T), na.rm=T) / (sum(!is.na(mrsa_sim_168_54$epi$surveil.detected)) / ncol(mrsa_sim_168_54$epi$surveil.detected))
+quantile(colSums(mrsa_sim_168_54$epi$surveil.detected, na.rm=T) / (sum(!is.na(mrsa_sim_168_54$epi$surveil.detected)) / ncol(mrsa_sim_168_54$epi$surveil.detected)), probs=c(0.025,0.975))
+
+mean(colSums(mrsa_sim_168_54$epi$surveil.detected, na.rm=T), na.rm=T)
+quantile(colSums(mrsa_sim_168_54$epi$surveil.detected, na.rm=T), probs=c(0.025,0.975))
+
+mean(colMeans(mrsa_sim_168_54$epi$surveil.decolon.success, na.rm=T), na.rm=T)
+quantile(colMeans(mrsa_sim_168_54$epi$surveil.decolon.success, na.rm=T), probs=c(0.025,0.975))
+
+mean(colMeans(mrsa_sim_168_54$epi$surveil.decolon.success / (mrsa_sim_168_54$epi$surveil.decolon.success+mrsa_sim_168_54$epi$surveil.decolon.fail), na.rm=T),na.rm=T) * 100
+quantile(colMeans(mrsa_sim_168_54$epi$surveil.decolon.success / (mrsa_sim_168_54$epi$surveil.decolon.success+mrsa_sim_168_54$epi$surveil.decolon.fail), na.rm=T) * 100, probs=c(0.025,0.975))
+
+mean(colSums(mrsa_sim_168_54$epi$surveil.decolon.success.colonizedtime, na.rm=T),na.rm=T) / (sum(!is.na(mrsa_sim_168_54$epi$surveil.detected)) / ncol(mrsa_sim_168_54$epi$surveil.detected))
+quantile(colSums(mrsa_sim_168_54$epi$surveil.decolon.success.colonizedtime, na.rm=T) / (sum(!is.na(mrsa_sim_168_54$epi$surveil.detected)) / ncol(mrsa_sim_168_54$epi$surveil.detected)), probs=c(0.025,0.975))
+
+mean(colSums(mrsa_sim_168_54$epi$i.num.location.isolation, na.rm=T),na.rm=T) / network_steps
+quantile(colSums(mrsa_sim_168_54$epi$i.num.location.isolation, na.rm=T) / network_steps, probs=c(0.025,0.975))
+
+mean(colSums(mrsa_sim_168_54$epi$s.num.location.isolation, na.rm=T),na.rm=T) / network_steps
+quantile(colSums(mrsa_sim_168_54$epi$s.num.location.isolation, na.rm=T) / network_steps, probs=c(0.025,0.975))
+
+mean(colSums(mrsa_sim_168_54$epi$surveil.cohort, na.rm=T),na.rm=T) / (sum(!is.na(mrsa_sim_168_54$epi$surveil.detected)) / ncol(mrsa_sim_168_54$epi$surveil.detected))
+quantile(colSums(mrsa_sim_168_54$epi$surveil.cohort, na.rm=T) / (sum(!is.na(mrsa_sim_168_54$epi$surveil.detected)) / ncol(mrsa_sim_168_54$epi$surveil.detected)), probs=c(0.025,0.975))
+
+mean(colMeans(mrsa_sim_168_54$epi$surveil.cohort/mrsa_sim_168_54$epi$surveil.known.i, na.rm=T),na.rm=T) * 100
+quantile(colMeans(mrsa_sim_168_54$epi$surveil.cohort/mrsa_sim_168_54$epi$surveil.known.i, na.rm=T) * 100, probs=c(0.025,0.975))
+
+#indicators for table: 336 surveillance, 54% hygiene
+load("mrsa_sim_336_54.RData")
+
+sum(!is.na(mrsa_sim_336_54$epi$surveil.detected)) / ncol(mrsa_sim_336_54$epi$surveil.detected)
+
+mean(colSums(mrsa_sim_336_54$epi$surveil.active, na.rm=T), na.rm=T) / network_steps
+quantile(colSums(mrsa_sim_336_54$epi$surveil.active, na.rm=T) / network_steps, probs=c(0.025,0.975)) 
+
+mean(colSums(mrsa_sim_336_54$epi$surveil.detected, na.rm=T), na.rm=T) / (sum(!is.na(mrsa_sim_336_54$epi$surveil.detected)) / ncol(mrsa_sim_336_54$epi$surveil.detected))
+quantile(colSums(mrsa_sim_336_54$epi$surveil.detected, na.rm=T) / (sum(!is.na(mrsa_sim_336_54$epi$surveil.detected)) / ncol(mrsa_sim_336_54$epi$surveil.detected)), probs=c(0.025,0.975))
+
+mean(colSums(mrsa_sim_336_54$epi$surveil.detected, na.rm=T), na.rm=T)
+quantile(colSums(mrsa_sim_336_54$epi$surveil.detected, na.rm=T), probs=c(0.025,0.975))
+
+mean(colMeans(mrsa_sim_336_54$epi$surveil.decolon.success, na.rm=T), na.rm=T)
+quantile(colMeans(mrsa_sim_336_54$epi$surveil.decolon.success, na.rm=T), probs=c(0.025,0.975))
+
+mean(colMeans(mrsa_sim_336_54$epi$surveil.decolon.success / (mrsa_sim_336_54$epi$surveil.decolon.success+mrsa_sim_336_54$epi$surveil.decolon.fail), na.rm=T),na.rm=T) * 100
+quantile(colMeans(mrsa_sim_336_54$epi$surveil.decolon.success / (mrsa_sim_336_54$epi$surveil.decolon.success+mrsa_sim_336_54$epi$surveil.decolon.fail), na.rm=T) * 100, probs=c(0.025,0.975))
+
+mean(colSums(mrsa_sim_336_54$epi$surveil.decolon.success.colonizedtime, na.rm=T),na.rm=T) / (sum(!is.na(mrsa_sim_336_54$epi$surveil.detected)) / ncol(mrsa_sim_336_54$epi$surveil.detected))
+quantile(colSums(mrsa_sim_336_54$epi$surveil.decolon.success.colonizedtime, na.rm=T) / (sum(!is.na(mrsa_sim_336_54$epi$surveil.detected)) / ncol(mrsa_sim_336_54$epi$surveil.detected)), probs=c(0.025,0.975))
+
+mean(colSums(mrsa_sim_336_54$epi$i.num.location.isolation, na.rm=T),na.rm=T) / network_steps
+quantile(colSums(mrsa_sim_336_54$epi$i.num.location.isolation, na.rm=T) / network_steps, probs=c(0.025,0.975))
+
+mean(colSums(mrsa_sim_336_54$epi$s.num.location.isolation, na.rm=T),na.rm=T) / network_steps
+quantile(colSums(mrsa_sim_336_54$epi$s.num.location.isolation, na.rm=T) / network_steps, probs=c(0.025,0.975))
+
+mean(colSums(mrsa_sim_336_54$epi$surveil.cohort, na.rm=T),na.rm=T) / (sum(!is.na(mrsa_sim_336_54$epi$surveil.detected)) / ncol(mrsa_sim_336_54$epi$surveil.detected))
+quantile(colSums(mrsa_sim_336_54$epi$surveil.cohort, na.rm=T) / (sum(!is.na(mrsa_sim_336_54$epi$surveil.detected)) / ncol(mrsa_sim_336_54$epi$surveil.detected)), probs=c(0.025,0.975))
+
+mean(colMeans(mrsa_sim_336_54$epi$surveil.cohort/mrsa_sim_336_54$epi$surveil.known.i, na.rm=T),na.rm=T) * 100
+quantile(colMeans(mrsa_sim_336_54$epi$surveil.cohort/mrsa_sim_336_54$epi$surveil.known.i, na.rm=T) * 100, probs=c(0.025,0.975))
+
+#indicators for table: 504 surveillance, 54% hygiene
+load("mrsa_sim_504_54.RData")
+
+sum(!is.na(mrsa_sim_504_54$epi$surveil.detected)) / ncol(mrsa_sim_504_54$epi$surveil.detected)
+
+mean(colSums(mrsa_sim_504_54$epi$surveil.active, na.rm=T), na.rm=T) / network_steps
+quantile(colSums(mrsa_sim_504_54$epi$surveil.active, na.rm=T) / network_steps, probs=c(0.025,0.975)) 
+
+mean(colSums(mrsa_sim_504_54$epi$surveil.detected, na.rm=T), na.rm=T) / (sum(!is.na(mrsa_sim_504_54$epi$surveil.detected)) / ncol(mrsa_sim_504_54$epi$surveil.detected))
+quantile(colSums(mrsa_sim_504_54$epi$surveil.detected, na.rm=T) / (sum(!is.na(mrsa_sim_504_54$epi$surveil.detected)) / ncol(mrsa_sim_504_54$epi$surveil.detected)), probs=c(0.025,0.975))
+
+mean(colSums(mrsa_sim_504_54$epi$surveil.detected, na.rm=T), na.rm=T)
+quantile(colSums(mrsa_sim_504_54$epi$surveil.detected, na.rm=T), probs=c(0.025,0.975))
+
+mean(colMeans(mrsa_sim_504_54$epi$surveil.decolon.success, na.rm=T), na.rm=T)
+quantile(colMeans(mrsa_sim_504_54$epi$surveil.decolon.success, na.rm=T), probs=c(0.025,0.975))
+
+mean(colMeans(mrsa_sim_504_54$epi$surveil.decolon.success / (mrsa_sim_504_54$epi$surveil.decolon.success+mrsa_sim_504_54$epi$surveil.decolon.fail), na.rm=T),na.rm=T) * 100
+quantile(colMeans(mrsa_sim_504_54$epi$surveil.decolon.success / (mrsa_sim_504_54$epi$surveil.decolon.success+mrsa_sim_504_54$epi$surveil.decolon.fail), na.rm=T) * 100, probs=c(0.025,0.975))
+
+mean(colSums(mrsa_sim_504_54$epi$surveil.decolon.success.colonizedtime, na.rm=T),na.rm=T) / (sum(!is.na(mrsa_sim_504_54$epi$surveil.detected)) / ncol(mrsa_sim_504_54$epi$surveil.detected))
+quantile(colSums(mrsa_sim_504_54$epi$surveil.decolon.success.colonizedtime, na.rm=T) / (sum(!is.na(mrsa_sim_504_54$epi$surveil.detected)) / ncol(mrsa_sim_504_54$epi$surveil.detected)), probs=c(0.025,0.975))
+
+mean(colSums(mrsa_sim_504_54$epi$i.num.location.isolation, na.rm=T),na.rm=T) / network_steps
+quantile(colSums(mrsa_sim_504_54$epi$i.num.location.isolation, na.rm=T) / network_steps, probs=c(0.025,0.975))
+
+mean(colSums(mrsa_sim_504_54$epi$s.num.location.isolation, na.rm=T),na.rm=T) / network_steps
+quantile(colSums(mrsa_sim_504_54$epi$s.num.location.isolation, na.rm=T) / network_steps, probs=c(0.025,0.975))
+
+mean(colSums(mrsa_sim_504_54$epi$surveil.cohort, na.rm=T),na.rm=T) / (sum(!is.na(mrsa_sim_504_54$epi$surveil.detected)) / ncol(mrsa_sim_504_54$epi$surveil.detected))
+quantile(colSums(mrsa_sim_504_54$epi$surveil.cohort, na.rm=T) / (sum(!is.na(mrsa_sim_504_54$epi$surveil.detected)) / ncol(mrsa_sim_504_54$epi$surveil.detected)), probs=c(0.025,0.975))
+
+mean(colMeans(mrsa_sim_504_54$epi$surveil.cohort/mrsa_sim_504_54$epi$surveil.known.i, na.rm=T),na.rm=T) * 100
+quantile(colMeans(mrsa_sim_504_54$epi$surveil.cohort/mrsa_sim_504_54$epi$surveil.known.i, na.rm=T) * 100, probs=c(0.025,0.975))
+
+#indicators for table: 672 surveillance, 54% hygiene
+load("mrsa_sim_672_54.RData")
+
+sum(!is.na(mrsa_sim_672_54$epi$surveil.detected)) / ncol(mrsa_sim_672_54$epi$surveil.detected)
+
+mean(colSums(mrsa_sim_672_54$epi$surveil.active, na.rm=T), na.rm=T) / network_steps
+quantile(colSums(mrsa_sim_672_54$epi$surveil.active, na.rm=T) / network_steps, probs=c(0.025,0.975)) 
+
+mean(colSums(mrsa_sim_672_54$epi$surveil.detected, na.rm=T), na.rm=T) / (sum(!is.na(mrsa_sim_672_54$epi$surveil.detected)) / ncol(mrsa_sim_672_54$epi$surveil.detected))
+quantile(colSums(mrsa_sim_672_54$epi$surveil.detected, na.rm=T) / (sum(!is.na(mrsa_sim_672_54$epi$surveil.detected)) / ncol(mrsa_sim_672_54$epi$surveil.detected)), probs=c(0.025,0.975))
+
+mean(colSums(mrsa_sim_672_54$epi$surveil.detected, na.rm=T), na.rm=T)
+quantile(colSums(mrsa_sim_672_54$epi$surveil.detected, na.rm=T), probs=c(0.025,0.975))
+
+mean(colMeans(mrsa_sim_672_54$epi$surveil.decolon.success, na.rm=T), na.rm=T)
+quantile(colMeans(mrsa_sim_672_54$epi$surveil.decolon.success, na.rm=T), probs=c(0.025,0.975))
+
+mean(colMeans(mrsa_sim_672_54$epi$surveil.decolon.success / (mrsa_sim_672_54$epi$surveil.decolon.success+mrsa_sim_672_54$epi$surveil.decolon.fail), na.rm=T),na.rm=T) * 100
+quantile(colMeans(mrsa_sim_672_54$epi$surveil.decolon.success / (mrsa_sim_672_54$epi$surveil.decolon.success+mrsa_sim_672_54$epi$surveil.decolon.fail), na.rm=T) * 100, probs=c(0.025,0.975))
+
+mean(colSums(mrsa_sim_672_54$epi$surveil.decolon.success.colonizedtime, na.rm=T),na.rm=T) / (sum(!is.na(mrsa_sim_672_54$epi$surveil.detected)) / ncol(mrsa_sim_672_54$epi$surveil.detected))
+quantile(colSums(mrsa_sim_672_54$epi$surveil.decolon.success.colonizedtime, na.rm=T) / (sum(!is.na(mrsa_sim_672_54$epi$surveil.detected)) / ncol(mrsa_sim_672_54$epi$surveil.detected)), probs=c(0.025,0.975))
+
+mean(colSums(mrsa_sim_672_54$epi$i.num.location.isolation, na.rm=T),na.rm=T) / network_steps
+quantile(colSums(mrsa_sim_672_54$epi$i.num.location.isolation, na.rm=T) / network_steps, probs=c(0.025,0.975))
+
+mean(colSums(mrsa_sim_672_54$epi$s.num.location.isolation, na.rm=T),na.rm=T) / network_steps
+quantile(colSums(mrsa_sim_672_54$epi$s.num.location.isolation, na.rm=T) / network_steps, probs=c(0.025,0.975))
+
+mean(colSums(mrsa_sim_672_54$epi$surveil.cohort, na.rm=T),na.rm=T) / (sum(!is.na(mrsa_sim_672_54$epi$surveil.detected)) / ncol(mrsa_sim_672_54$epi$surveil.detected))
+quantile(colSums(mrsa_sim_672_54$epi$surveil.cohort, na.rm=T) / (sum(!is.na(mrsa_sim_672_54$epi$surveil.detected)) / ncol(mrsa_sim_672_54$epi$surveil.detected)), probs=c(0.025,0.975))
+
+mean(colMeans(mrsa_sim_672_54$epi$surveil.cohort/mrsa_sim_672_54$epi$surveil.known.i, na.rm=T),na.rm=T) * 100
+quantile(colMeans(mrsa_sim_672_54$epi$surveil.cohort/mrsa_sim_672_54$epi$surveil.known.i, na.rm=T) * 100, probs=c(0.025,0.975))
